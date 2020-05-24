@@ -31,11 +31,6 @@ diagnosis in patients with TC </summary>
 
 <p>
 
-    ## New names:
-    ## * `` -> ...1
-    ## * `` -> ...2
-    ## * `` -> ...3
-
 ![](Overdiagnosis_files/figure-gfm/ft_incidental_overall-1.svg)<!-- -->
 
 </p>
@@ -49,11 +44,6 @@ patients with TC </summary>
 
 <p>
 
-    ## New names:
-    ## * `` -> ...1
-    ## * `` -> ...2
-    ## * `` -> ...3
-
 ![](Overdiagnosis_files/figure-gfm/glmm_incidental_overall-1.svg)<!-- -->
 
 </p>
@@ -66,11 +56,6 @@ patients with TC </summary>
 diagnosis in Male patients with TC </summary>
 
 <p>
-
-    ## New names:
-    ## * `` -> ...1
-    ## * `` -> ...2
-    ## * `` -> ...3
 
 ![](Overdiagnosis_files/figure-gfm/ft_incidental_male-1.svg)<!-- -->
 
@@ -97,11 +82,6 @@ diagnosis in Female patients with TC </summary>
 Male patients </summary>
 
 <p>
-
-    ## New names:
-    ## * `` -> ...1
-    ## * `` -> ...2
-    ## * `` -> ...3
 
 ![](Overdiagnosis_files/figure-gfm/glmm_incidental_male-1.svg)<!-- -->
 

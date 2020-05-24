@@ -454,7 +454,7 @@ popgl_res <- rma(estimate, sei=stderror, mods = ~ meta, method="FE", data=popgl,
 
 <details><summary> Suppl. Figure 1: (Freeman-Tukey) Frequency of Incidental diagnosis in patients with TC </summary>
 <p>
-```{r ft_incidental_overall, echo=FALSE, fig.height=8, fig.width=12} 
+```{r ft_incidental_overall, echo=FALSE, fig.height=8, fig.width=12, message=FALSE, warning=FALSE} 
 tfma1 <- cbind( 
   c( "Author", prema1ft$study, 
      paste("Overall proportion for", ma1ft$k.eff, "studies","\n", 
@@ -520,7 +520,7 @@ forestplot(tfma1,
 
 <details><summary> Suppl. Figure 2: (GLMM) Frequency of Incidental diagnosis in patients with TC </summary>
 <p>
-```{r glmm_incidental_overall, echo=FALSE, fig.height=8, fig.width=12}
+```{r glmm_incidental_overall, echo=FALSE, fig.height=8, fig.width=12, message=FALSE, warning=FALSE}
 
 glma1 <- cbind( 
   c( "Author", prema1$study, 
@@ -585,7 +585,7 @@ forestplot(glma1,
 
 <details><summary> Suppl. Figure 3: (Freeman-Tukey) Frequency of Incidental diagnosis in Male patients with TC </summary>
 <p>
-```{r ft_incidental_male, echo=FALSE, fig.height=8, fig.width=12}
+```{r ft_incidental_male, echo=FALSE, fig.height=8, fig.width=12, message=FALSE, warning=FALSE}
 tfma2 <- cbind( 
   c( "Author", prema2ft$study, 
      paste("Overall proportion for", ma2ft$k.eff, "studies","\n", 
@@ -649,7 +649,7 @@ forestplot(tfma2,
 
 <details><summary> Suppl. Figure 4: (Freeman-Tukey) Frequency of Incidental diagnosis in Female patients with TC </summary>
 <p>
-```{r ft_incidental_female, echo=FALSE, fig.height=3, fig.width=12, message=FALSE}
+```{r ft_incidental_female, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 
 tfma3 <- cbind( 
   c( "Author", prema3ft$study, 
@@ -713,7 +713,7 @@ forestplot(tfma3,
 
 <details><summary> Suppl. Figure 5: (GLMM) Frequency of Incidental diagnosis in Male patients </summary>
 <p>
-```{r glmm_incidental_male, echo=FALSE, fig.height=3, fig.width=12}
+```{r glmm_incidental_male, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 
 glma4 <- cbind( 
   c( "Author", prema4$study, 
@@ -777,7 +777,7 @@ forestplot(glma4,
 
 <details><summary> Suppl. Figure 6: (GLMM) Frequency of Incidental diagnosis in Female patients </summary>
 <p>
-```{r glmm_incidental_female, echo=FALSE, fig.height=3, fig.width=12, message=FALSE}
+```{r glmm_incidental_female, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 
 glma5 <- cbind( 
   c( "Author", prema5$study, 
@@ -841,7 +841,7 @@ forestplot(glma5,
 
 <details><summary> Suppl. Figure 7: (Freeman-Tukey) Frequency of Incidental diagnosis in patients with TC and  tumor size >10mm </summary>
 <p>
-```{r ft_incidental_greater10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE}
+```{r ft_incidental_greater10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 tfma8 <- cbind( 
   c( "Author", prema8ft$study, 
      paste("Overall proportion for", ma8ft$k.eff, "studies","\n", 
@@ -904,7 +904,7 @@ forestplot(tfma8,
 
 <details><summary> Suppl. Figure 8: (Freeman-Tukey) Frequency of Incidental diagnosis in patients with TC and tumor size <10mm </summary>
 <p>
-```{r ft_incidental_less10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE}
+```{r ft_incidental_less10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 
 tfma9 <- cbind( 
   c( "Author", prema9ft$study, 
@@ -968,7 +968,7 @@ forestplot(tfma9,
 
 <details><summary> Suppl. Figure 9: (GLMM) Frequency of Incidental diagnosis in patients with TC and tumor size >10mm </summary>
 <p>
-```{r glmm_incidental_greater10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE}
+```{r glmm_incidental_greater10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 
 glma10 <- cbind( 
   c( "Author", prema10$study, 
@@ -1032,7 +1032,7 @@ forestplot(glma10,
 
 <details><summary> Suppl. Figure 10: (GLMM) Frequency of Incidental diagnosis in patients with TC and tumor size <10mm</summary>
 <p>
-```{r glmm_incidental_less10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE}
+```{r glmm_incidental_less10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 
 glma11 <- cbind( 
   c( "Author", prema11$study, 
@@ -1097,7 +1097,7 @@ forestplot(glma11,
 
 <details><summary> Suppl. Figure 11: (Freeman-Tukey) Frequency of Incidental diagnosis in patients with TC from the USA </summary>
 <p>
-```{r ft_incidental_USA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE}
+```{r ft_incidental_USA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 tfma12 <- cbind( 
   c( "Author", prema12ft$study, 
      paste("Overall proportion for", ma12ft$k.eff, "studies","\n", 
@@ -1160,7 +1160,7 @@ forestplot(tfma12,
 
 <details><summary> Suppl. Figure 12: (Freeman-Tukey) Frequency of Incidental diagnosis in patients with TC from a non-USA country </summary>
 <p>
-```{r ft_incidental_nonUSA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE}
+```{r ft_incidental_nonUSA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 
 tfma13 <- cbind( 
   c( "Author", prema13ft$study, 
@@ -1224,7 +1224,7 @@ forestplot(tfma13,
 
 <details><summary> Suppl. Figure 13: (GLMM) Frequency of Incidental diagnosis in patients with TC from the USA </summary>
 <p>
-```{r glmm_incidental_USA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE}
+```{r glmm_incidental_USA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 
 glma14 <- cbind( 
   c( "Author", prema14$study, 
@@ -1288,7 +1288,7 @@ forestplot(glma14,
 
 <details><summary> Suppl. Figure 14: (GLMM) Frequency of Incidental diagnosis in patients with TC from a non-USA country </summary>
 <p>
-```{r glmm_incidental_nonUSA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE}
+```{r glmm_incidental_nonUSA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 
 glma15 <- cbind( 
   c( "Author", prema15$study, 
@@ -1351,7 +1351,7 @@ forestplot(glma15,
 
 <details><summary> Suppl. Figure 15: (Freeman-Tukey) Frequency of Incidental diagnosis in patients with TC from population based studies </summary>
 <p>
-```{r ft_incidental_pop, echo=FALSE, fig.height=3, fig.width=12, message=FALSE}
+```{r ft_incidental_pop, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 tfma16 <- cbind( 
   c( "Author", prema16ft$study, 
      paste("Overall proportion for", ma16ft$k.eff, "studies","\n", 
@@ -1414,7 +1414,7 @@ forestplot(tfma16,
 
 <details><summary> Suppl. Figure 16: (Freeman-Tukey) Frequency of Incidental diagnosis in patients with TC from non-population-based studies </summary>
 <p>
-```{r ft_incidental_nonpop, echo=FALSE, fig.height=6, fig.width=12, message=FALSE}
+```{r ft_incidental_nonpop, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
 
 tfma17 <- cbind( 
   c( "Author", prema17ft$study, 
@@ -1478,7 +1478,7 @@ forestplot(tfma17,
 
 <details><summary> Suppl. Figure 17: (GLMM) Frequency of Incidental diagnosis in patients with TC from population-based studies </summary>
 <p>
-```{r glmm_incidental_pop, echo=FALSE, fig.height=3, fig.width=12, message=FALSE}
+```{r glmm_incidental_pop, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 
 glma18 <- cbind( 
   c( "Author", prema18$study, 
@@ -1542,7 +1542,7 @@ forestplot(glma18,
 
 <details><summary> Suppl. Figure 14: (GLMM) Frequency of Incidental diagnosis in patients with TC from non-population-based studies </summary>
 <p>
-```{r glmm_incidental_nonpop, echo=FALSE, fig.height=6, fig.width=12, message=FALSE}
+```{r glmm_incidental_nonpop, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
 
 glma19 <- cbind( 
   c( "Author", prema19$study, 
@@ -1607,7 +1607,7 @@ forestplot(glma19,
 
 
 
-```{r comprobando2, echo=FALSE, message=FALSE}
+```{r comprobando2, echo=FALSE, message=FALSE, warning=FALSE}
 
 #comprobando tukey
 #forest(ma3ft,transf=transf.ipft.hm, targs=list(ni=prema1ft$totalparticipants))
