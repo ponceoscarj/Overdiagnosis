@@ -38,7 +38,6 @@ library(lattice)
 >[Click here to view our raw data available as `.CSV` file](https://github.com/ponceoscarj/Overdiagnosis/blob/master/Data/overdiagnosis_excel.csv)
 
 
-
 ```{r uploading_database, echo=FALSE, warning=FALSE, message=FALSE}
 od <- read.csv("Data/overdiagnosis_excel.csv")
 ```
@@ -48,11 +47,7 @@ od$tumorsize[od$tumorsize=="20-Oct"] <- "10-20"
 ```
 
 ```{r functions_for_analysis_figures, echo=FALSE, warning=FALSE, message=FALSE, fig.show='hide'}
-
-
-inc_overall <- subset(od, overall=="Yes" & !is.na(inc))
-
-
+round2 = function(x, n=0) {scale<-10^n; sign(x)*trunc(abs(x)*scale+0.5)/scale}
 
 ft <- function(database){
                 db <- database
@@ -72,9 +67,8 @@ ft <- function(database){
                 ma <- rma(db$yi, db$vi, method="DL", data=db)
                 exp <- predict(ma, transf=transf.ipft.hm, targs=list(ni=db$n))
 
-                list(pre = db, ma = ma, exp = exp)
+      list(pre = db, ma = ma, exp = exp)
 }
-
 
 glmm <- function(database){
                 db <- database
@@ -89,15 +83,18 @@ glmm <- function(database){
                                      "(",formatC(db$lwr.ci, format='f', digits =2),
                                      "-",formatC(db$upr.ci, format='f', digits=2),")")   
                 db <- db[order(db$est),]
-list(pre = db, ma = ma, exp = exp)
+        list(pre = db, ma = ma, exp = exp)
 }
 
-
 subgroup_interaction <- function(group1, group2, name1, name2){
-  x <- data.frame(estimate = c(coef(group1$ma), coef(group2$ma)), stderror = c(group1$ma$se, group2$ma$se),
-                       meta = c(name1, name2), tau2 = round(c(group1$ma$tau2, group2$ma$tau2),3))
+                  
+          x <- data.frame(estimate = c(coef(group1$ma), coef(group2$ma)), 
+                          stderror = c(group1$ma$se, group2$ma$se),
+                          meta = c(name1, name2), 
+                          tau2 = round(c(group1$ma$tau2, group2$ma$tau2),3))
   
-  subgroup_test <- rma(estimate, sei=stderror, mods = ~ meta, method="FE", data=x, digits=3)
+          subgroup_test <- rma(estimate, sei=stderror, mods = ~ meta, 
+                               method="FE", data=x, digits=3)
 }
 
 
@@ -272,6 +269,56 @@ forestplot(words,
            col=fpColors(box="black",line="grey", axes="grey20", summary="black"))
 
 }  
+
+extract_info_maft_proportions <- function(group, maresults, subgroup = NA, sub_analysis){
+  ifelse(is.na(subgroup),
+  a <- c(paste(group),
+    maresults$ma[[15]],
+    sum(maresults$pre$x),
+    sum(maresults$pre$n),
+    maresults$ma[[25]],
+    maresults$exp[[1]], 
+    maresults$exp[[3]], 
+    maresults$exp[[4]],
+    NA),
+  a <- c(paste(group),
+    maresults$ma[[15]],
+    sum(maresults$pre$x),
+    sum(maresults$pre$n),
+    maresults$ma[[25]],
+    maresults$exp[[1]], 
+    maresults$exp[[3]], 
+    maresults$exp[[4]],
+    sub_analysis[[24]]))
+  
+  return(a)
+}
+
+
+extract_info_maglmm_proportions <- function(group, maresults, subgroup = NA, sub_analysis){
+  ifelse(is.na(subgroup),
+  a <- c(paste(group),
+    maresults$ma[[15]],
+    sum(maresults$pre$x),
+    sum(maresults$pre$n),
+    maresults$ma[[28]],
+    maresults$exp[[1]], 
+    maresults$exp[[3]], 
+    maresults$exp[[4]],
+    NA),
+  a <- c(paste(group),
+    maresults$ma[[15]],
+    sum(maresults$pre$x),
+    sum(maresults$pre$n),
+    maresults$ma[[28]],
+    maresults$exp[[1]], 
+    maresults$exp[[3]], 
+    maresults$exp[[4]],
+    sub_analysis[[24]]))
+  
+  return(a)
+}
+
 
 
 ```
@@ -544,11 +591,131 @@ hist_popbased_glmm <- subgroup_interaction(hist20, hist22, "Population based", "
 
 # Summary of forest plots 
 
+**Figure 1. Incidental diagnosis in patients with Thyroid Cancer by population group**
+```{r summary_forest_plots, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
+
+x <- rbind(
+  c( "subgroup", "studies", "n", "N", "i2", "est", "llci", "ulci", "p"),
+  extract_info_maglmm_proportions("Overall", inc2),
+  c("Sex", rep(NA, 8)),
+  extract_info_maglmm_proportions("Male", inc4, subgroup = T, sub_analysis = inc_sex_ft),
+  extract_info_maglmm_proportions("Female", inc6),
+  c("Age", rep(NA, 8)),
+  extract_info_maft_proportions(">45y", inc7, subgroup = T, sub_analysis = inc_age_ft),
+  extract_info_maft_proportions("<45y", inc9),
+  c("Tumor size", rep(NA, 8)),
+  extract_info_maglmm_proportions(">10mm", inc12, subgroup = T, sub_analysis = inc_tumorsize_ft),
+  extract_info_maglmm_proportions("<10mm", inc14),
+  c("USA-based", rep(NA, 8)),
+  extract_info_maglmm_proportions("USA", inc16, subgroup = T, sub_analysis = inc_uscountry_ft),
+  extract_info_maglmm_proportions("non-USA", inc18),
+  c("Population-based", rep(NA, 8)),
+  extract_info_maglmm_proportions("Population", inc20, subgroup = T, sub_analysis = inc_popbased_ft),
+  extract_info_maglmm_proportions("non-Population", inc22)
+  )
+
+
+colnames(x) <- x[1,]
+x <- x[-1, ]
+x <- as_tibble(x)
+x$rate <- ifelse(is.na(x$n),
+                 NA,
+                 paste(x$n, "/", x$N))
+
+x[c(2:9)] <- sapply(x[c(2:9)],as.numeric)
+x$pr <- ifelse(is.na(x$est),
+               NA,
+              paste(formatC(x$est, format="f", digits =2), 
+              "(", formatC(x$llci, format="f", digits =2),
+              "-",
+              formatC(x$ulci, format='f', digits=2),")"))
+
+x$i2 <- ifelse(x$studies == 1, 
+               paste("na"),
+               paste(round2(x$i2, n=0),"%"))
+
+x$p <- ifelse (is.na(x$p),
+              NA, 
+              ifelse(x$p<0.001, paste("<0.001"), formatC(x$p, format="f", digits =3)))
+
+x <- x %>% add_row(.before = 2)
+x <- x %>% add_row(.before = 6)
+x <- x %>% add_row(.before = 10)
+x <- x %>% add_row(.before = 14)
+x <- x %>% add_row(.before = 18)
+x <- x %>% add_row(.before = 1)
+x <- x %>% add_row(.after  = 23)
+
+prevalence <- cbind(
+  c("Population",  x$subgroup),
+  c("N of studies", x$studies),
+  c("Frequency (n/N)", x$rate),
+  c("I^2",  x$i2),
+  c("Prevalence (95% CI)", x$pr),
+  c("p value",  x$p))
+
+sub1 <- c(6,7,10,11, 14,15, 18,19, 22,23) 
+prevalence[,1][sub1] <- paste("  ",prevalence[,1][sub1]) 
+
+
+
+rrsprev <- structure(list(
+  mean = c(NA, x$est),
+  lower = c(NA, x$llci),
+  upper = c(NA, x$ulci)),
+  .Names = c("mean", "lower", "upper"),
+  row.names = c(NA, -23L),
+  class = "data.frame")
+
+x <- x %>% add_row(.before = 1)
+
+box_size <- x$N*0.00025
+
+forestplot(prevalence,
+               graph.pos = 5,
+               zero = NA,
+               rrsprev,
+               new_page = TRUE,
+               colgap = unit(5, "mm"),
+               hrzl_lines = list("2" = gpar (lwd=1, columns=c(1:7), col="black")),
+               lineheight=unit(0.5,'cm'),
+               boxsize = box_size,
+               line.margin = 2,
+               is.summary = c(T,F, 
+                              F, F,
+                              T, F, F, F,
+                              T, F, F, F,
+                              T, F, F, F,
+                              T, F, F, F,
+                              T, F, F, F),
+               align = c("l","c", "c", "c"),
+               ci.vertices = TRUE,
+               txt_gp = fpTxtGp(label =gpar (cex=0.8), 
+                                ticks = gpar(cex = 0.8, fontface="bold"),
+                                summary = gpar(cex = 0.8),
+                                xlab = gpar(cex=0.8)),
+               xticks = c(0, 0.1, 0.2, 0.3, 0.4,0.5, 0.6, 0.7, 0.8, 0.9, 1),
+               xlog=FALSE,
+               clip = c(0,  0.4),
+               grid = gpar(lty=3, col="gray"),
+               lwd.xaxis = 1,
+               lwd.ci = 2.2,
+               graphwidth = unit(10,"cm"),
+               col=fpColors(box="black",line="grey", axes="grey20", summary="black"))
+
+
+
+
+```
 
 
 # Supplementary Figures 
 
 **These graphs were used to generate the summary of forest plots presented in the published article <link>**
+
+
+
+
 
 
 ## Suppl. Figures using Freeman-Tukey (FT) analysis 

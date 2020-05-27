@@ -29,6 +29,10 @@ organize some data.
 
 # Summary of forest plots
 
+**Figure 1. Incidental diagnosis in patients with Thyroid Cancer by
+population group**
+![](Output%20Figures/summary_forest_plots-1.svg)<!-- -->
+
 # Supplementary Figures
 
 **These graphs were used to generate the summary of forest plots
