@@ -592,27 +592,40 @@ hist_popbased_glmm <- subgroup_interaction(hist20, hist22, "Population based", "
 # Summary of forest plots 
 
 **Figure 1. Incidental diagnosis in patients with Thyroid Cancer by population group**
-```{r summary_forest_plots, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
+```{r summary_overall_forestplots, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
 
 x <- rbind(
   c( "subgroup", "studies", "n", "N", "i2", "est", "llci", "ulci", "p"),
-  extract_info_maglmm_proportions("Overall", inc2),
+  c(NA),
+  extract_info_maft_proportions("Overall", inc1),
+  c(NA),
+  c("by Method of Diagnosis", rep(NA, 8)),
+  extract_info_maft_proportions("Imaging", i1),
+  extract_info_maft_proportions("Ultrasound", us1),
+  extract_info_maft_proportions("CT scan", tac1),
+  extract_info_maft_proportions("MRI", mri1),
+  extract_info_maft_proportions("PET", pet1),
+  extract_info_maft_proportions("Histology", hist1),
+  c(NA),
+  c("by Subgroups", rep(NA, 8)),
   c("Sex", rep(NA, 8)),
-  extract_info_maglmm_proportions("Male", inc4, subgroup = T, sub_analysis = inc_sex_ft),
-  extract_info_maglmm_proportions("Female", inc6),
+  extract_info_maft_proportions("Male", inc3, subgroup = T, sub_analysis = inc_sex_ft),
+  extract_info_maft_proportions("Female", inc5),
   c("Age", rep(NA, 8)),
   extract_info_maft_proportions(">45y", inc7, subgroup = T, sub_analysis = inc_age_ft),
   extract_info_maft_proportions("<45y", inc9),
   c("Tumor size", rep(NA, 8)),
-  extract_info_maglmm_proportions(">10mm", inc12, subgroup = T, sub_analysis = inc_tumorsize_ft),
-  extract_info_maglmm_proportions("<10mm", inc14),
+  extract_info_maft_proportions(">10mm", inc11, subgroup = T, sub_analysis = inc_tumorsize_ft),
+  extract_info_maft_proportions("<10mm", inc13),
   c("USA-based", rep(NA, 8)),
-  extract_info_maglmm_proportions("USA", inc16, subgroup = T, sub_analysis = inc_uscountry_ft),
-  extract_info_maglmm_proportions("non-USA", inc18),
+  extract_info_maft_proportions("USA", inc15, subgroup = T, sub_analysis = inc_uscountry_ft),
+  extract_info_maft_proportions("non-USA", inc17),
   c("Population-based", rep(NA, 8)),
-  extract_info_maglmm_proportions("Population", inc20, subgroup = T, sub_analysis = inc_popbased_ft),
-  extract_info_maglmm_proportions("non-Population", inc22)
+  extract_info_maft_proportions("Population", inc19, subgroup = T, sub_analysis = inc_popbased_ft),
+  extract_info_maft_proportions("non-Population", inc21),
+  c(NA)
   )
+
 
 
 colnames(x) <- x[1,]
@@ -638,13 +651,6 @@ x$p <- ifelse (is.na(x$p),
               NA, 
               ifelse(x$p<0.001, paste("<0.001"), formatC(x$p, format="f", digits =3)))
 
-x <- x %>% add_row(.before = 2)
-x <- x %>% add_row(.before = 6)
-x <- x %>% add_row(.before = 10)
-x <- x %>% add_row(.before = 14)
-x <- x %>% add_row(.before = 18)
-x <- x %>% add_row(.before = 1)
-x <- x %>% add_row(.after  = 23)
 
 prevalence <- cbind(
   c("Population",  x$subgroup),
@@ -654,22 +660,30 @@ prevalence <- cbind(
   c("Prevalence (95% CI)", x$pr),
   c("p value",  x$p))
 
-sub1 <- c(6,7,10,11, 14,15, 18,19, 22,23) 
+sub1 <- c(6, 11, 14,17, 20, 23, 26) 
 prevalence[,1][sub1] <- paste("  ",prevalence[,1][sub1]) 
 
-
+sub2 <- c(7:10, 15,16, 18,19, 21,22, 24,25, 27,28)
+prevalence[,1][sub2] <- paste("     ",prevalence[,1][sub2]) 
 
 rrsprev <- structure(list(
   mean = c(NA, x$est),
   lower = c(NA, x$llci),
   upper = c(NA, x$ulci)),
   .Names = c("mean", "lower", "upper"),
-  row.names = c(NA, -23L),
+  row.names = c(NA, -29L),
   class = "data.frame")
+
 
 x <- x %>% add_row(.before = 1)
 
-box_size <- x$N*0.00025
+x$box <- ifelse(x$N<=1000, 1, 
+                ifelse(x$N>1000 & x$N <= 2000, 2,
+                ifelse(x$N>2000 & x$N <= 3000, 3,
+                ifelse(x$N>3000 & x$N <= 4000, 4,
+                ifelse(x$N>4000 & x$N <= 5000, 5, NA)))))
+
+box <- x$box*0.2
 
 forestplot(prevalence,
                graph.pos = 5,
@@ -679,15 +693,13 @@ forestplot(prevalence,
                colgap = unit(5, "mm"),
                hrzl_lines = list("2" = gpar (lwd=1, columns=c(1:7), col="black")),
                lineheight=unit(0.5,'cm'),
-               boxsize = box_size,
+               boxsize = box,
                line.margin = 2,
-               is.summary = c(T,F, 
-                              F, F,
-                              T, F, F, F,
-                              T, F, F, F,
-                              T, F, F, F,
-                              T, F, F, F,
-                              T, F, F, F),
+               is.summary = c(T,F,F,F,
+                              T, rep(F, 7),
+                              T, 
+                              rep(c(T,F,F), 5),
+                              F),
                align = c("l","c", "c", "c"),
                ci.vertices = TRUE,
                txt_gp = fpTxtGp(label =gpar (cex=0.8), 
@@ -709,11 +721,157 @@ forestplot(prevalence,
 ```
 
 
+**Figure 2. Imaging and Histological Incidental diagnosis in patients with Thyroid Cancer by population group**
+```{r summary_Imaging_Histological_forestplots, echo=FALSE, fig.height=10, fig.width=12, message=FALSE, warning=FALSE}
+
+x <- rbind(
+  c( "subgroup", "studies", "n", "N", "i2", "est", "llci", "ulci", "p"),
+  c(NA),
+  extract_info_maft_proportions("Imaging - Overall", i1),
+  c(NA),
+  c("Subgroups", rep(NA, 8)),
+  c("Sex", rep(NA, 8)),
+  extract_info_maft_proportions("Male", i3, subgroup = T, sub_analysis = i_sex_ft),
+  extract_info_maft_proportions("Female", i5),
+  c("Age", rep(NA, 8)),
+  extract_info_maft_proportions(">45y", i7, subgroup = T, sub_analysis = i_age_ft),
+  extract_info_maft_proportions("<45y", i9),
+  c("Tumor size", rep(NA, 8)),
+  extract_info_maft_proportions(">10mm", i11, subgroup = T, sub_analysis = i_tumorsize_ft),
+  extract_info_maft_proportions("<10mm", i13),
+  c("USA-based", rep(NA, 8)),
+  extract_info_maft_proportions("USA", i15, subgroup = T, sub_analysis = i_uscountry_ft),
+  extract_info_maft_proportions("non-USA", i17),
+  c("Population-based", rep(NA, 8)),
+  extract_info_maft_proportions("Population", i19, subgroup = T, sub_analysis = i_popbased_ft),
+  extract_info_maft_proportions("non-Population", i21),
+  c(NA),
+  
+  
+  c(NA),
+  extract_info_maft_proportions("Histology - Overall", hist1),
+  c(NA),
+  c("Subgroups", rep(NA, 8)),
+  c("Sex", rep(NA, 8)),
+  extract_info_maft_proportions("Male", hist3, subgroup = T, sub_analysis = hist_sex_ft),
+  extract_info_maft_proportions("Female", hist5),
+  c("Age", rep(NA, 8)),
+  extract_info_maft_proportions(">45y", hist7, subgroup = T, sub_analysis = hist_age_ft),
+  extract_info_maft_proportions("<45y", hist9),
+  c("Tumor size", rep(NA, 8)),
+  extract_info_maft_proportions(">10mm", hist11, subgroup = T, sub_analysis = hist_tumorsize_ft),
+  extract_info_maft_proportions("<10mm", hist13),
+  c("USA-based", rep(NA, 8)),
+  extract_info_maft_proportions("USA", hist15, subgroup = T, sub_analysis = hist_uscountry_ft),
+  extract_info_maft_proportions("non-USA", hist17),
+  c("Population-based", rep(NA, 8)),
+  extract_info_maft_proportions("Population", hist19, subgroup = T, 
+                                sub_analysis = hist_popbased_ft),
+  extract_info_maft_proportions("non-Population", hist21),
+  c(NA)
+  )
+
+colnames(x) <- x[1,]
+x <- x[-1, ]
+x <- as_tibble(x)
+x$rate <- ifelse(is.na(x$n),
+                 NA,
+                 paste(x$n, "/", x$N))
+
+x[c(2:9)] <- sapply(x[c(2:9)],as.numeric)
+x$pr <- ifelse(is.na(x$est),
+               NA,
+              paste(formatC(x$est, format="f", digits =2), 
+              "(", formatC(x$llci, format="f", digits =2),
+              "-",
+              formatC(x$ulci, format='f', digits=2),")"))
+
+x$i2 <- ifelse(x$studies == 1, 
+               paste("na"),
+               paste(round2(x$i2, n=0),"%"))
+
+x$p <- ifelse (is.na(x$p),
+              NA, 
+              ifelse(x$p<0.001, paste("<0.001"), formatC(x$p, format="f", digits =3)))
+
+
+prevalence <- cbind(
+  c("Population",  x$subgroup),
+  c("N of studies", x$studies),
+  c("Frequency (n/N)", x$rate),
+  c("I^2",  x$i2),
+  c("Prevalence (95% CI)", x$pr),
+  c("p value",  x$p))
+
+sub1 <- c(6, 9, 12, 15, 18, 26, 29, 32, 35, 38)
+prevalence[,1][sub1] <- paste("  ",prevalence[,1][sub1]) 
+
+sub2 <- c(7, 8, 10, 11, 13, 14, 16, 17, 19, 20,
+          27, 28, 30, 31, 33, 34, 36, 37, 39, 40)
+prevalence[,1][sub2] <- paste("     ",prevalence[,1][sub2]) 
+
+rrsprev <- structure(list(
+  mean = c(NA, x$est),
+  lower = c(NA, x$llci),
+  upper = c(NA, x$ulci)),
+  .Names = c("mean", "lower", "upper"),
+  row.names = c(NA, -41L),
+  class = "data.frame")
+
+
+x <- x %>% add_row(.before = 1)
+
+x$box <- ifelse(x$N<=1000, 1, 
+                ifelse(x$N>1000 & x$N <= 2000, 2,
+                ifelse(x$N>2000 & x$N <= 3000, 3,
+                ifelse(x$N>3000 & x$N <= 4000, 4,
+                ifelse(x$N>4000 & x$N <= 5000, 5, NA)))))
+
+box <- x$box*0.2
+
+forestplot(prevalence,
+               graph.pos = 5,
+               zero = NA,
+               rrsprev,
+               new_page = TRUE,
+               colgap = unit(5, "mm"),
+               hrzl_lines = list("2" = gpar (lwd=1, columns=c(1:7), col="black")),
+               lineheight=unit(0.5,'cm'),
+               boxsize = box,
+               line.margin = 2,
+               is.summary = c(T,F,F,F,
+                              T, 
+                              rep(c(T,F,F), 5),
+                              F, F, F, F,
+                              T, 
+                              rep(c(T,F,F), 5),
+                              F),
+               align = c("l","c", "c", "c"),
+               ci.vertices = TRUE,
+               txt_gp = fpTxtGp(label =gpar (cex=0.8), 
+                                ticks = gpar(cex = 0.8, fontface="bold"),
+                                summary = gpar(cex = 0.8),
+                                xlab = gpar(cex=0.8)),
+               xticks = c(0, 0.1, 0.2, 0.3, 0.4,0.5, 0.6, 0.7, 0.8, 0.9, 1),
+               xlog=FALSE,
+               clip = c(0,  0.4),
+               grid = gpar(lty=3, col="gray"),
+               lwd.xaxis = 1,
+               lwd.ci = 2.2,
+               graphwidth = unit(10,"cm"),
+               col=fpColors(box="black",line="grey", axes="grey20", summary="black"))
+
+
+
+
+```
+
+
+
+
 # Supplementary Figures 
 
-**These graphs were used to generate the summary of forest plots presented in the published article <link>**
-
-
+**The information from the supplementarygraphs were used to generate Figure 1 and Figure 2** 
 
 
 

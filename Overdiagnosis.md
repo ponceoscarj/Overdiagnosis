@@ -31,7 +31,11 @@ organize some data.
 
 **Figure 1. Incidental diagnosis in patients with Thyroid Cancer by
 population group**
-![](Output%20Figures/summary_forest_plots-1.svg)<!-- -->
+![](Output%20Figures/summary_overall_forestplots-1.svg)<!-- -->
+
+**Figure 2. Imaging and Histological Incidental diagnosis in patients
+with Thyroid Cancer by population group**
+![](Output%20Figures/summary_Imaging_Histological_forestplots-1.svg)<!-- -->
 
 # Supplementary Figures
 
