@@ -592,7 +592,7 @@ hist_popbased_glmm <- subgroup_interaction(hist20, hist22, "Population based", "
 # Summary of forest plots 
 
 **Figure 1. Incidental diagnosis in patients with Thyroid Cancer by population group**
-```{r summary_overall_forestplots, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
+```{r summary_overall_forestplots, echo=FALSE, fig.height=7, fig.width=12, message=FALSE, warning=FALSE}
 
 x <- rbind(
   c( "subgroup", "studies", "n", "N", "i2", "est", "llci", "ulci", "p"),
