@@ -39,8 +39,8 @@ with Thyroid Cancer by population group**
 
 # Supplementary Figures
 
-**The information from the supplementarygraphs were used to generate
-Figure 1 and Figure 2**
+**The information from the following supplementary graphs was used to
+generate Figure 1 and Figure 2**
 
 ## Suppl. Figures using Freeman-Tukey (FT) analysis
 
