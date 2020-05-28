@@ -1,6 +1,6 @@
 ---
 title: "Overdiagnosis"
-author: "Oscar J Ponce & Eddy Lincango"
+author: "Oscar J. Ponce & Eddy Lincango-Naranjo"
 date: "5/18/2020"
 output: github_document
 ---
@@ -25,7 +25,7 @@ library(lattice)
 
 `forestplot`:[package](https://cran.r-project.org/web/packages/forestplot/forestplot.pdf) used to create forest plots.
 
-`R markdown`: [package](https://rmarkdown.rstudio.com/) used to analyze and share all documents on www.github.com(http://github.com/)
+`R markdown`: [package](https://rmarkdown.rstudio.com/) used to analyze and share all documents on [www.github.com](http://github.com/)
 
 `Tidyverse`: [package](https://tidyverse.tidyverse.org/) used to organize some data.
 
@@ -591,7 +591,9 @@ hist_popbased_glmm <- subgroup_interaction(hist20, hist22, "Population based", "
 
 # Summary of forest plots 
 
-**Figure 1. Incidental diagnosis in patients with Thyroid Cancer by population group**
+## Figure 1. Incidental diagnosis in patients with Thyroid Cancer by population group
+> To generate this forest plot, we used information from Supplementary Figures 1 to 30.
+
 ```{r summary_overall_forestplots, echo=FALSE, fig.height=7, fig.width=12, message=FALSE, warning=FALSE}
 
 x <- rbind(
@@ -721,7 +723,9 @@ forestplot(prevalence,
 ```
 
 
-**Figure 2. Imaging and Histological Incidental diagnosis in patients with Thyroid Cancer by population group**
+## Figure 2. Imaging and Histological Incidental diagnosis in patients with Thyroid Cancer by population group
+> To generate this forest plot, we used information from Supplementary Figures 1 to 30.
+
 ```{r summary_Imaging_Histological_forestplots, echo=FALSE, fig.height=10, fig.width=12, message=FALSE, warning=FALSE}
 
 x <- rbind(
@@ -870,10 +874,6 @@ forestplot(prevalence,
 
 
 # Supplementary Figures 
-
-**The information from the following supplementary graphs was used to generate Figure 1 and Figure 2** 
-
-
 
 
 ## Suppl. Figures using Freeman-Tukey (FT) analysis 

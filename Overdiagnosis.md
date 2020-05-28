@@ -1,6 +1,6 @@
 Overdiagnosis
 ================
-Oscar J Ponce & Eddy Lincango
+Oscar J. Ponce & Eddy Lincango-Naranjo
 5/18/2020
 
 ## R Packages
@@ -12,7 +12,7 @@ perform the analysis.
 used to create forest plots.
 
 `R markdown`: [package](https://rmarkdown.rstudio.com/) used to analyze
-and share all documents on www.github.com(<http://github.com/>)
+and share all documents on [www.github.com](http://github.com/)
 
 `Tidyverse`: [package](https://tidyverse.tidyverse.org/) used to
 organize some data.
@@ -29,18 +29,21 @@ organize some data.
 
 # Summary of forest plots
 
-**Figure 1. Incidental diagnosis in patients with Thyroid Cancer by
-population group**
+## Figure 1. Incidental diagnosis in patients with Thyroid Cancer by population group
+
+> To generate this forest plot, we used information from Supplementary
+> Figures 1 to 30.
+
 ![](Output%20Figures/summary_overall_forestplots-1.svg)<!-- -->
 
-**Figure 2. Imaging and Histological Incidental diagnosis in patients
-with Thyroid Cancer by population group**
+## Figure 2. Imaging and Histological Incidental diagnosis in patients with Thyroid Cancer by population group
+
+> To generate this forest plot, we used information from Supplementary
+> Figures 1 to 30.
+
 ![](Output%20Figures/summary_Imaging_Histological_forestplots-1.svg)<!-- -->
 
 # Supplementary Figures
-
-**The information from the following supplementary graphs was used to
-generate Figure 1 and Figure 2**
 
 ## Suppl. Figures using Freeman-Tukey (FT) analysis
 
