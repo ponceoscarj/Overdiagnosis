@@ -19,15 +19,22 @@ library(DescTools)
 library(lattice)
 ```
 
-## R Packages
+## Open Data
+>Click any of the following links to view the documents
 
-`metafor`:[package](http://www.metafor-project.org/doku.php) used to perform the analysis.
 
-`forestplot`:[package](https://cran.r-project.org/web/packages/forestplot/forestplot.pdf) used to create forest plots.
 
-`R markdown`: [package](https://rmarkdown.rstudio.com/) used to analyze and share all documents on [www.github.com](http://github.com/)
+| Stage  |      File     |  
+|:----------:|:-------------:|
+| Protocol | [Prospero](https://www.crd.york.ac.uk/prospero/display_record.php?RecordID=166827)|
+| Search strategy | `Shown below` (Available to download as `.CSV`: [OVID](https://github.com/ponceoscarj/Thymectomy/blob/master/1%20Search%20strategy/ovid_search.csv), [Scopus](https://github.com/ponceoscarj/Thymectomy/blob/master/1%20Search%20strategy/scopus_search.csv)) |
+| Abstract screening | [References used in this stage or search results](https://github.com/ponceoscarj/Thymectomy/blob/master/Screening_results/articles_for_abstract_screening.txt) |
+| Full-text screening | [References used in this stage](https://github.com/ponceoscarj/Thymectomy/blob/master/Screening_results/articles_for_fulltext_screening.txt) |
+| Included studies | [References used for data extraction](https://github.com/ponceoscarj/Thymectomy/blob/master/Screening_results/included_articles.txt) |
+| Raw Outcome data | [Available as `.CSV`](https://github.com/ponceoscarj/Thymectomy/blob/master/Data/thymectomy_outcomes.csv)|
+| Analysis codes | [Script as `R Markdown`](https://github.com/ponceoscarj/Thymectomy/blob/master/Thymectomy_results.Rmd)|
 
-`Tidyverse`: [package](https://tidyverse.tidyverse.org/) used to organize some data.
+
 
 ## Analysis codes
 
@@ -44,6 +51,23 @@ od <- read.csv("Data/overdiagnosis_excel.csv")
 
 ```{r cleaning, echo=FALSE, warning=FALSE, message=FALSE}
 od$tumorsize[od$tumorsize=="20-Oct"] <- "10-20"
+
+names(od)[2] <- "study"
+names(od)[13] <- "sex"
+names(od)[26] <- "totalparticipants"
+names(od)[28] <- "imaging"
+names(od)[29] <- "us"
+names(od)[30] <- "tac"
+names(od)[31] <- "pet"
+names(od)[32] <- "mri"
+names(od)[34] <- "histology"
+names(od)[44] <- "uscountry"
+names(od)[45] <- "popbased"
+
+table(od$country.1)
+View(od)
+colnames(od)
+
 ```
 
 ```{r functions_for_analysis_figures, echo=FALSE, warning=FALSE, message=FALSE, fig.show='hide'}
@@ -329,6 +353,7 @@ od1 <- od
 names(od1)[names(od1) == "inc"] <- "x"
 names(od1)[names(od1) == "totalparticipants"] <- "n"
 
+
 inc_overall <- subset(od1, overall=="Yes" & !is.na(x))
 inc1 <- ft(inc_overall)
 inc2 <- glmm(inc_overall)
@@ -402,7 +427,6 @@ inc_popbased_glmm <- subgroup_interaction(inc20, inc22, "Population based", "Non
 od2 <- od
 names(od2)[names(od2) == "imaging"] <- "x"
 names(od2)[names(od2) == "totalparticipants"] <- "n"
-
 
 i_overall <- subset(od2, overall=="Yes" & !is.na(x))
 i1 <- ft(i_overall)
@@ -520,7 +544,6 @@ mri2 <- glmm(mri_overall)
 od3 <- od
 names(od3)[names(od3) == "histology"] <- "x"
 names(od3)[names(od3) == "totalparticipants"] <- "n"
-
 
 hist_overall <- subset(od3, overall=="Yes" & !is.na(x))
 hist1 <- ft(hist_overall)
