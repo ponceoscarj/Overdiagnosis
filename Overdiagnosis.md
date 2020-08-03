@@ -3,29 +3,19 @@ Overdiagnosis
 Oscar J. Ponce & Eddy Lincango-Naranjo
 5/18/2020
 
-## R Packages
+## Open Data
 
-`metafor`:[package](http://www.metafor-project.org/doku.php) used to
-perform the analysis.
+> Click any of the following links to view the documents
 
-`forestplot`:[package](https://cran.r-project.org/web/packages/forestplot/forestplot.pdf)
-used to create forest plots.
-
-`R markdown`: [package](https://rmarkdown.rstudio.com/) used to analyze
-and share all documents on [www.github.com](http://github.com/)
-
-`Tidyverse`: [package](https://tidyverse.tidyverse.org/) used to
-organize some data.
-
-## Analysis codes
-
-> [Click here to view our full script available as `R Markdown`
-> file](https://github.com/ponceoscarj/Overdiagnosis/blob/master/Overdiagnosis.Rmd)
-
-## Raw data
-
-> [Click here to view our raw data available as `.CSV`
-> file](https://github.com/ponceoscarj/Overdiagnosis/blob/master/Data/overdiagnosis_excel.csv)
+|        Stage        |                                                      File                                                      |
+| :-----------------: | :------------------------------------------------------------------------------------------------------------: |
+|      Protocol       |     [Available as PDF](https://github.com/ponceoscarj/Overdiagnosis/blob/master/1%20Protocol/Protocol.pdf)     |
+|   Search strategy   |                                                      Link                                                      |
+| Abstract screening  |                                                      Link                                                      |
+| Full-text screening |                                                      Link                                                      |
+|  Included studies   |                                                      Link                                                      |
+|  Raw Outcome data   |  [Available as `.CSV`](https://github.com/ponceoscarj/Overdiagnosis/blob/master/Data/overdiagnosis_excel.csv)  |
+|   Analysis codes    | [Script available as `R Markdown`](https://github.com/ponceoscarj/Overdiagnosis/blob/master/Overdiagnosis.Rmd) |
 
 # Summary of forest plots
 

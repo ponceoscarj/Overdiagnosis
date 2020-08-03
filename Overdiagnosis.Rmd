@@ -26,23 +26,16 @@ library(lattice)
 
 | Stage  |      File     |  
 |:----------:|:-------------:|
-| Protocol | [Prospero](https://www.crd.york.ac.uk/prospero/display_record.php?RecordID=166827)|
-| Search strategy | `Shown below` (Available to download as `.CSV`: [OVID](https://github.com/ponceoscarj/Thymectomy/blob/master/1%20Search%20strategy/ovid_search.csv), [Scopus](https://github.com/ponceoscarj/Thymectomy/blob/master/1%20Search%20strategy/scopus_search.csv)) |
-| Abstract screening | [References used in this stage or search results](https://github.com/ponceoscarj/Thymectomy/blob/master/Screening_results/articles_for_abstract_screening.txt) |
-| Full-text screening | [References used in this stage](https://github.com/ponceoscarj/Thymectomy/blob/master/Screening_results/articles_for_fulltext_screening.txt) |
-| Included studies | [References used for data extraction](https://github.com/ponceoscarj/Thymectomy/blob/master/Screening_results/included_articles.txt) |
-| Raw Outcome data | [Available as `.CSV`](https://github.com/ponceoscarj/Thymectomy/blob/master/Data/thymectomy_outcomes.csv)|
-| Analysis codes | [Script as `R Markdown`](https://github.com/ponceoscarj/Thymectomy/blob/master/Thymectomy_results.Rmd)|
+| Protocol | [Available as PDF](https://github.com/ponceoscarj/Overdiagnosis/blob/master/1%20Protocol/Protocol.pdf)|
+| Search strategy | Link |
+| Abstract screening | Link |
+| Full-text screening | Link |
+| Included studies | Link |
+| Raw Outcome data | [Available as `.CSV`](https://github.com/ponceoscarj/Overdiagnosis/blob/master/Data/overdiagnosis_excel.csv) |
+| Analysis codes | [Script available as `R Markdown`](https://github.com/ponceoscarj/Overdiagnosis/blob/master/Overdiagnosis.Rmd) |
 
 
 
-## Analysis codes
-
->[Click here to view our full script available as  `R Markdown` file](https://github.com/ponceoscarj/Overdiagnosis/blob/master/Overdiagnosis.Rmd)
-
-## Raw data
-
->[Click here to view our raw data available as `.CSV` file](https://github.com/ponceoscarj/Overdiagnosis/blob/master/Data/overdiagnosis_excel.csv)
 
 
 ```{r uploading_database, echo=FALSE, warning=FALSE, message=FALSE}
@@ -50,9 +43,9 @@ od <- read.csv("Data/overdiagnosis_excel.csv")
 ```
 
 ```{r cleaning, echo=FALSE, warning=FALSE, message=FALSE}
-od$tumorsize[od$tumorsize=="20-Oct"] <- "10-20"
 
 names(od)[2] <- "study"
+names(od)[11] <- "tumorsize"
 names(od)[13] <- "sex"
 names(od)[26] <- "totalparticipants"
 names(od)[28] <- "imaging"
@@ -64,9 +57,7 @@ names(od)[34] <- "histology"
 names(od)[44] <- "uscountry"
 names(od)[45] <- "popbased"
 
-table(od$country.1)
-View(od)
-colnames(od)
+
 
 ```
 
