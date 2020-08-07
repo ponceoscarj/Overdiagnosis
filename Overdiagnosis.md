@@ -21,10 +21,242 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
 
 ## Figure 1. Incidental diagnosis in patients with Thyroid Cancer by population group
 
-> To generate this forest plot, we used information from Supplementary
-> Figures 1 to 30.
+> All analyses were performed with the Freeman-Tukey (FT) method
 
 ![](Output%20Figures/summary_overall_forestplots-1.svg)<!-- -->
+
+> Show supplementary figures used to generate Figure 1
+
+<details>
+
+<summary>Click to show</summary>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 1: (FT) Frequency of Incidental diagnosis in
+    patients with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_incidental_overall-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 2: (FT) Frequency of Incidental imaging
+    diagnosis in patients with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_imaging_overall-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 3: (FT) Frequency of Incidental Ultrasound
+    diagnosis in patients with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_ultrasound_overall-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 4: (FT) Frequency of Incidental Computed
+    Tomography Scan diagnosis in patients with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_CT_overall-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 5: (FT) Frequency of Incidental Magnetic
+    Resonance Imaging diagnosis in patients with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_mri_overall-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 6: (FT) Frequency of Incidental Positron
+    Emission Tomography diagnosis in patients with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_pet_overall-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 7: (FT) Frequency of Incidental histology
+    diagnosis in patients with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_histology_overall-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 8: (FT) Frequency of Incidental diagnosis in
+    Male patients with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_incidental_male-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 9: (FT) Frequency of Incidental diagnosis in
+    Female patients with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_incidental_female-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 10: (FT) Frequency of Incidental diagnosis
+    in patients with TC and tumor size \>10mm </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_incidental_greater10-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 11: (FT) Frequency of Incidental diagnosis
+    in patients with TC and tumor size \<10mm </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_incidental_less10-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 12: (FT) Frequency of Incidental diagnosis
+    in patients with TC from the USA </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_incidental_USA-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 13: (FT) Frequency of Incidental diagnosis
+    in patients with TC from a non-USA country </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_incidental_nonUSA-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 14: (FT) Frequency of Incidental diagnosis
+    in patients with TC from population based studies </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_incidental_pop-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 15: (FT) Frequency of Incidental diagnosis
+    in patients with TC from non-population-based studies </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_incidental_nonpop-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+</details>
 
 ## Figure 2. Imaging and Histological Incidental diagnosis in patients with Thyroid Cancer by population group
 
@@ -33,438 +265,285 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
 
 ![](Output%20Figures/summary_Imaging_Histological_forestplots-1.svg)<!-- -->
 
-# Supplementary Figures
-
-## Suppl. Figures using Freeman-Tukey (FT) analysis
-
-> Overall incidental diagnosis
+> Show supplementary figures used to generate Figure 2
 
 <details>
 
-<summary> Suppl. Figure 1: (FT) Frequency of Incidental diagnosis in
-patients with TC </summary>
-
-<p>
-
-![](Output%20Figures/ft_incidental_overall-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 2: (FT) Frequency of Incidental diagnosis in
-Male patients with TC </summary>
-
-<p>
-
-![](Output%20Figures/ft_incidental_male-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 3: (FT) Frequency of Incidental diagnosis in
-Female patients with TC </summary>
-
-<p>
-
-![](Output%20Figures/ft_incidental_female-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 4: (FT) Frequency of Incidental diagnosis in
-patients with TC and tumor size \>10mm </summary>
-
-<p>
-
-![](Output%20Figures/ft_incidental_greater10-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 5: (FT) Frequency of Incidental diagnosis in
-patients with TC and tumor size \<10mm </summary>
-
-<p>
-
-![](Output%20Figures/ft_incidental_less10-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 6: (FT) Frequency of Incidental diagnosis in
-patients with TC from the USA </summary>
-
-<p>
-
-![](Output%20Figures/ft_incidental_USA-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 7: (FT) Frequency of Incidental diagnosis in
-patients with TC from a non-USA country </summary>
-
-<p>
-
-![](Output%20Figures/ft_incidental_nonUSA-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 8: (FT) Frequency of Incidental diagnosis in
-patients with TC from population based studies </summary>
-
-<p>
-
-![](Output%20Figures/ft_incidental_pop-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 9: (FT) Frequency of Incidental diagnosis in
-patients with TC from non-population-based studies </summary>
-
-<p>
-
-![](Output%20Figures/ft_incidental_nonpop-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<br />
-
-> Imaging incidental diagnosis
-
-<details>
-
-<summary> Suppl. Figure 10: (FT) Frequency of Incidental diagnosis in
-patients with TC </summary>
-
-<p>
-
-![](Output%20Figures/ft_imaging_overall-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 11: (FT) Frequency of Incidental imaging
-diagnosis in Male patients with TC </summary>
-
-<p>
-
-![](Output%20Figures/ft_imaging_male-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 12: (FT) Frequency of Incidental imaging
-diagnosis in Female patients with TC </summary>
-
-<p>
-
-![](Output%20Figures/ft_imaging_female-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 13: (FT) Frequency of Incidental imaging
-diagnosis in patients with TC and tumor size \>10mm </summary>
-
-<p>
-
-![](Output%20Figures/ft_imaging_greater10-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 14: (FT) Frequency of Incidental imaging
-diagnosis in patients with TC and tumor size \<10mm </summary>
-
-<p>
-
-![](Output%20Figures/ft_imaging_less10-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 15: (FT) Frequency of Incidental imaging
-diagnosis in patients with TC from the USA </summary>
-
-<p>
-
-![](Output%20Figures/ft_imaging_USA-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 16: (FT) Frequency of Incidental imaging
-diagnosis in patients with TC from a non-USA country </summary>
-
-<p>
-
-![](Output%20Figures/ft_imaging_nonUSA-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 17: (FT) Frequency of Incidental imaging
-diagnosis in patients with TC from population based studies </summary>
-
-<p>
-
-![](Output%20Figures/ft_imaging_pop-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 18: (FT) Frequency of Incidental imaging
-diagnosis in patients with TC from non-population-based studies
-</summary>
-
-<p>
-
-![](Output%20Figures/ft_imaging_nonpop-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<br />
-
-> Ultrasound incidental diagnosis
-
-<details>
-
-<summary> Suppl. Figure 19: (FT) Frequency of Incidental Ultrasound
-diagnosis in patients with TC </summary>
-
-<p>
-
-![](Output%20Figures/ft_ultrasound_overall-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<br />
-
-> CT incidental diagnosis
-
-<details>
-
-<summary> Suppl. Figure 19: (FT) Frequency of Incidental Computed
-Tomography Scan diagnosis in patients with TC </summary>
-
-<p>
-
-![](Output%20Figures/ft_CT_overall-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<br />
-
-> PET incidental diagnosis
-
-<details>
-
-<summary> Suppl. Figure 20: (FT) Frequency of Incidental Positron
-Emission Tomography diagnosis in patients with TC </summary>
-
-<p>
-
-![](Output%20Figures/ft_pet_overall-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<br />
-
-> MRI incidental diagnosis
-
-<details>
-
-<summary> Suppl. Figure 21: (FT) Frequency of Incidental Magnetic
-Resonance Imaging diagnosis in patients with TC </summary>
-
-<p>
-
-![](Output%20Figures/ft_mri_overall-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<br />
-
-> Histology incidental diagnosis
-
-<details>
-
-<summary> Suppl. Figure 22: (FT) Frequency of Incidental histology
-diagnosis in patients with TC </summary>
-
-<p>
-
-![](Output%20Figures/ft_histology_overall-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 23: (FT) Frequency of Incidental histology
-diagnosis in Male patients with TC </summary>
-
-<p>
-
-![](Output%20Figures/ft_histology_male-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 24: (FT) Frequency of Incidental Histology
-diagnosis in Female patients with TC </summary>
-
-<p>
-
-![](Output%20Figures/ft_histology_female-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 25: (FT) Frequency of Incidental Histology
-diagnosis in patients with TC and tumor size \>10mm </summary>
-
-<p>
-
-![](Output%20Figures/ft_histology_greater10-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 26: (FT) Frequency of Incidental Histology
-diagnosis in patients with TC and tumor size \<10mm </summary>
-
-<p>
-
-![](Output%20Figures/ft_histidental_less10-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 27: (FT) Frequency of Incidental Histology
-diagnosis in patients with TC from the USA </summary>
-
-<p>
-
-![](Output%20Figures/ft_histology_USA-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 28: (FT) Frequency of Incidental Histology
-diagnosis in patients with TC from a non-USA country </summary>
-
-<p>
-
-![](Output%20Figures/ft_histology_nonUSA-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 29: (FT) Frequency of Incidental Histology
-diagnosis in patients with TC from population based studies </summary>
-
-<p>
-
-![](Output%20Figures/ft_histology_pop-1.svg)<!-- -->
-
-</p>
-
-</details>
-
-<details>
-
-<summary> Suppl. Figure 30: (FT) Frequency of Incidental Histology
-diagnosis in patients with TC from non-population-based studies
-</summary>
-
-<p>
-
-![](Output%20Figures/ft_histology_nonpop-1.svg)<!-- -->
-
-</p>
+<summary>Click to show</summary>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 2: (FT) Frequency of Incidental imaging
+    diagnosis in patients with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_imaging_overall_copy-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 16: (FT) Frequency of Incidental imaging
+    diagnosis in Male patients with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_imaging_male-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 17: (FT) Frequency of Incidental imaging
+    diagnosis in Female patients with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_imaging_female-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 18: (FT) Frequency of Incidental imaging
+    diagnosis in patients with TC and tumor size \>10mm </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_imaging_greater10-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 19: (FT) Frequency of Incidental imaging
+    diagnosis in patients with TC and tumor size \<10mm </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_imaging_less10-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 20: (FT) Frequency of Incidental imaging
+    diagnosis in patients with TC from the USA </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_imaging_USA-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 21: (FT) Frequency of Incidental imaging
+    diagnosis in patients with TC from a non-USA country </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_imaging_nonUSA-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 22: (FT) Frequency of Incidental imaging
+    diagnosis in patients with TC from population based studies
+    </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_imaging_pop-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 23: (FT) Frequency of Incidental imaging
+    diagnosis in patients with TC from non-population-based studies
+    </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_imaging_nonpop-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 7: (FT) Frequency of Incidental histology
+    diagnosis in patients with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_histology_overall_copy-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 24: (FT) Frequency of Incidental histology
+    diagnosis in Male patients with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_histology_male-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 25: (FT) Frequency of Incidental Histology
+    diagnosis in Female patients with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_histology_female-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 26: (FT) Frequency of Incidental Histology
+    diagnosis in patients with TC and tumor size \>10mm </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_histology_greater10-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 27: (FT) Frequency of Incidental Histology
+    diagnosis in patients with TC and tumor size \<10mm </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_histidental_less10-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 28: (FT) Frequency of Incidental Histology
+    diagnosis in patients with TC from the USA </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_histology_USA-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 29: (FT) Frequency of Incidental Histology
+    diagnosis in patients with TC from a non-USA country </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_histology_nonUSA-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 30: (FT) Frequency of Incidental Histology
+    diagnosis in patients with TC from population based studies
+    </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_histology_pop-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 31: (FT) Frequency of Incidental Histology
+    diagnosis in patients with TC from non-population-based studies
+    </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_histology_nonpop-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
 
 </details>
 
