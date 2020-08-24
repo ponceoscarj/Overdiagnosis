@@ -1,0 +1,9 @@
+﻿Search line ,Search terms
+1,TITLE-ABS-KEY(thyroid* W/3 (cancer* or neoplasm* or carcinoma*) W/3 (diagnos* or detect* or identify* or identified or identification*))
+2,TITLE-ABS-KEY(((diagnos* or detect* or event or events or identify* or identified or identification*) W/5 (trigger* or chance)) OR incidental OR incidentally OR palpabl* OR palpat* OR screen* OR serendipit* OR subclinical)
+3,"TITLE-ABS-KEY(cohort* or ""longitudinal study"" or ""longitudinal survey"" or ""longitudinal analysis"" or ""longitudinal evaluation"" or longitudinal* or ((retrospective or ""ex post facto"") W/3 (study or survey or analysis or design)) or retrospectiv* or ""prospective study"" or ""prospective survey"" or ""prospective analysis"" or prospectiv* or (population W/3 (stud* or survey* or analys* or research)) or ""incidence study"" or ""incidence survey"" or ""incidence analysis"" or ((""follow-up"" or followup) W/1 (stud* or survey or analysis)) or (compar* and (study or trial)))"
+4,1 and 2 and 3
+5,DOCTYPE(ed) OR DOCTYPE(bk) OR DOCTYPE(er) OR DOCTYPE(no) OR DOCTYPE(sh)
+6,4 and not 5
+7,INDEX(embase) OR INDEX(medline) OR PMID(0* OR 1* OR 2* OR 3* OR 4* OR 5* OR 6* OR 7* OR 8* OR 9*)
+8,6 and not 7

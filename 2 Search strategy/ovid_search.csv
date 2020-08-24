@@ -1,0 +1,24 @@
+﻿Search line ,Search terms
+1,"exp Thyroid Neoplasms/di, dg [Diagnosis, Diagnostic Imaging]"
+2,exp thyroid cancer/di [Diagnosis]
+3,"(thyroid* adj3 (cancer* or neoplasm* or carcinoma*)).ti,ab,hw,kw."
+4,"(diagnos* or detect* or identify* or identified or identification*).ti,ab,hw,kw."
+5,"1 or 2 or (thyroid* adj3 (cancer* or neoplasm* or carcinoma*) adj3 (diagnos* or detect* or identify* or identified or identification*)).ti,ab,hw,kw."
+6,exp incidental findings/
+7,exp Mass Screening/
+8,exp Palpation/
+9,"(((diagnos* or detect* or event or events or identify* or identified or identification*) adj5 (trigger* or chance)) or incidental or incidentally or palpabl* or palpat* or screen* or serendipit* or subclinical).ti,ab,hw,kw."
+10,6 or 7 or 8 or 9
+11,5 and 10
+12,exp comparative study/
+13,exp Cohort Studies/
+14,exp longitudinal study/
+15,exp retrospective study/
+16,exp prospective study/
+17,exp population research/
+18,"(cohort* or ""longitudinal study"" or ""longitudinal survey"" or ""longitudinal analysis"" or ""longitudinal evaluation"" or longitudinal* or ((retrospective or ""ex post facto"") adj3 (study or survey or analysis or design)) or retrospectiv* or ""prospective study"" or ""prospective survey"" or ""prospective analysis"" or prospectiv* or (population adj3 (stud* or survey* or analys* or research)) or ""incidence study"" or ""incidence survey"" or ""incidence analysis"" or ((""follow-up"" or followup) adj (stud* or survey or analysis)) or (compar* and (study or trial))).mp,pt."
+19,or/12-18
+20,11 and 19
+21,"limit 20 to (editorial or erratum or note or addresses or autobiography or bibliography or biography or blogs or comment or dictionary or directory or interactive tutorial or interview or lectures or legal cases or legislation or news or newspaper article or overall or patient education handout or periodical index or portraits or published erratum or video-audio media or webcasts) [Limit not valid in Embase,Ovid MEDLINE(R),Ovid MEDLINE(R) Daily Update,Ovid MEDLINE(R) In-Process,Ovid MEDLINE(R) Publisher; records were retained]"
+22,20 not 21
+23,remove duplicates from 22

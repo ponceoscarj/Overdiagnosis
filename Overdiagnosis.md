@@ -7,25 +7,43 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
 
 > Click any of the following links to view the documents
 
-|        Stage        |                                                      File                                                      |
-| :-----------------: | :------------------------------------------------------------------------------------------------------------: |
-|      Protocol       |     [Available as PDF](https://github.com/ponceoscarj/Overdiagnosis/blob/master/1%20Protocol/Protocol.pdf)     |
-|   Search strategy   |                                                      Link                                                      |
-| Abstract screening  |                                                      Link                                                      |
-| Full-text screening |                                                      Link                                                      |
-|  Included studies   |                                                      Link                                                      |
-|  Raw Outcome data   |  [Available as `.CSV`](https://github.com/ponceoscarj/Overdiagnosis/blob/master/Data/overdiagnosis_excel.csv)  |
-|   Analysis codes    | [Script available as `R Markdown`](https://github.com/ponceoscarj/Overdiagnosis/blob/master/Overdiagnosis.Rmd) |
+|        Stage        |                                                                                                                             File                                                                                                                              |
+| :-----------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|      Protocol       |                                                                            [Available as PDF](https://github.com/ponceoscarj/Overdiagnosis/blob/master/1%20Protocol/Protocol.pdf)                                                                             |
+|   Search strategy   | `Shown below` (Available to download as `.CSV`: [OVID](https://github.com/ponceoscarj/Thymectomy/blob/master/1%20Search%20strategy/ovid_search.csv), [Scopus](https://github.com/ponceoscarj/Thymectomy/blob/master/1%20Search%20strategy/scopus_search.csv)) |
+| Abstract screening  |                                                                                                                             Link                                                                                                                              |
+| Full-text screening |                                                                                                                             Link                                                                                                                              |
+|  Included studies   |                                                                                                                             Link                                                                                                                              |
+|  Raw Outcome data   |                                                                         [Available as `.CSV`](https://github.com/ponceoscarj/Overdiagnosis/blob/master/Data/overdiagnosis_excel.csv)                                                                          |
+|   Analysis codes    |                                                                        [Script available as `R Markdown`](https://github.com/ponceoscarj/Overdiagnosis/blob/master/Overdiagnosis.Rmd)                                                                         |
+
+## Search strategy
+
+<details>
+
+<summary>Show OVID search</summary>
+
+![](Output%20Figures/ovid-1.png)<!-- -->
+
+</details>
+
+<details>
+
+<summary>Show SCOPUS search</summary>
+
+![](Output%20Figures/scopus-1.png)<!-- -->
+
+</details>
 
 # Summary of forest plots
 
 ## Figure 1. Incidental diagnosis in patients with Thyroid Cancer by population group
 
-> All analyses were performed with the Freeman-Tukey (FT) method
+***All analyses were performed with the Freeman-Tukey (FT) method***
 
 ![](Output%20Figures/summary_overall_forestplots-1.svg)<!-- -->
 
-> Show supplementary figures used to generate Figure 1
+> **Show supplementary figures used to generate Figure 1**
 
 <details>
 
@@ -36,7 +54,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     <details>
     
     <summary> Suppl. Figure 1: (FT) Frequency of Incidental diagnosis in
-    patients with TC </summary>
+    all patients with TC </summary>
     
     <p>
     
@@ -171,6 +189,36 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     <details>
     
     <summary> Suppl. Figure 10: (FT) Frequency of Incidental diagnosis
+    in patients aged 45 years and older with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_incidental_45older-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 11: (FT) Frequency of Incidental diagnosis
+    in patients aged 45 years and younger with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_incidental_45younger-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 12: (FT) Frequency of Incidental diagnosis
     in patients with TC and tumor size \>10mm </summary>
     
     <p>
@@ -185,7 +233,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 11: (FT) Frequency of Incidental diagnosis
+    <summary> Suppl. Figure 13: (FT) Frequency of Incidental diagnosis
     in patients with TC and tumor size \<10mm </summary>
     
     <p>
@@ -200,7 +248,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 12: (FT) Frequency of Incidental diagnosis
+    <summary> Suppl. Figure 14: (FT) Frequency of Incidental diagnosis
     in patients with TC from the USA </summary>
     
     <p>
@@ -215,7 +263,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 13: (FT) Frequency of Incidental diagnosis
+    <summary> Suppl. Figure 15: (FT) Frequency of Incidental diagnosis
     in patients with TC from a non-USA country </summary>
     
     <p>
@@ -230,7 +278,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 14: (FT) Frequency of Incidental diagnosis
+    <summary> Suppl. Figure 16: (FT) Frequency of Incidental diagnosis
     in patients with TC from population based studies </summary>
     
     <p>
@@ -245,7 +293,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 15: (FT) Frequency of Incidental diagnosis
+    <summary> Suppl. Figure 17: (FT) Frequency of Incidental diagnosis
     in patients with TC from non-population-based studies </summary>
     
     <p>
@@ -260,11 +308,11 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
 
 ## Figure 2. Imaging and Histological Incidental diagnosis in patients with Thyroid Cancer by population group
 
-> All analyses were performed with the Freeman-Tukey (FT) method
+***All analyses were performed with the Freeman-Tukey (FT) method***
 
 ![](Output%20Figures/summary_Imaging_Histological_forestplots-1.svg)<!-- -->
 
-> Show supplementary figures used to generate Figure 2
+> **Show supplementary figures used to generate Figure 2**
 
 <details>
 
@@ -274,7 +322,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 2: (FT) Frequency of Incidental imaging
+    <summary> Suppl. Figure 2: (FT) Frequency of Incidental Imaging
     diagnosis in patients with TC </summary>
     
     <p>
@@ -289,7 +337,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 16: (FT) Frequency of Incidental imaging
+    <summary> Suppl. Figure 18: (FT) Frequency of Incidental Imaging
     diagnosis in Male patients with TC </summary>
     
     <p>
@@ -304,7 +352,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 17: (FT) Frequency of Incidental imaging
+    <summary> Suppl. Figure 19: (FT) Frequency of Incidental Imaging
     diagnosis in Female patients with TC </summary>
     
     <p>
@@ -319,7 +367,37 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 18: (FT) Frequency of Incidental imaging
+    <summary> Suppl. Figure 20: (FT) Frequency of Incidental Imaging
+    diagnosis in patients aged 45 years and older with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_imaging_45older-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 21: (FT) Frequency of Incidental Imaging
+    diagnosis in patients aged 45 years and younger with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_imaging_45younger-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 22: (FT) Frequency of Incidental Imaging
     diagnosis in patients with TC and tumor size \>10mm </summary>
     
     <p>
@@ -334,7 +412,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 19: (FT) Frequency of Incidental imaging
+    <summary> Suppl. Figure 23: (FT) Frequency of Incidental Imaging
     diagnosis in patients with TC and tumor size \<10mm </summary>
     
     <p>
@@ -349,7 +427,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 20: (FT) Frequency of Incidental imaging
+    <summary> Suppl. Figure 24: (FT) Frequency of Incidental Imaging
     diagnosis in patients with TC from the USA </summary>
     
     <p>
@@ -364,7 +442,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 21: (FT) Frequency of Incidental imaging
+    <summary> Suppl. Figure 25: (FT) Frequency of Incidental Imaging
     diagnosis in patients with TC from a non-USA country </summary>
     
     <p>
@@ -379,7 +457,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 22: (FT) Frequency of Incidental imaging
+    <summary> Suppl. Figure 26: (FT) Frequency of Incidental Imaging
     diagnosis in patients with TC from population based studies
     </summary>
     
@@ -395,7 +473,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 23: (FT) Frequency of Incidental imaging
+    <summary> Suppl. Figure 27: (FT) Frequency of Incidental Imaging
     diagnosis in patients with TC from non-population-based studies
     </summary>
     
@@ -411,7 +489,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 7: (FT) Frequency of Incidental histology
+    <summary> Suppl. Figure 7: (FT) Frequency of Incidental Histology
     diagnosis in patients with TC </summary>
     
     <p>
@@ -426,7 +504,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 24: (FT) Frequency of Incidental histology
+    <summary> Suppl. Figure 28: (FT) Frequency of Incidental Histology
     diagnosis in Male patients with TC </summary>
     
     <p>
@@ -441,7 +519,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 25: (FT) Frequency of Incidental Histology
+    <summary> Suppl. Figure 29: (FT) Frequency of Incidental Histology
     diagnosis in Female patients with TC </summary>
     
     <p>
@@ -456,7 +534,37 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 26: (FT) Frequency of Incidental Histology
+    <summary> Suppl. Figure 30: (FT) Frequency of Incidental Histology
+    diagnosis in patients aged 45 years and older with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_histology_45older-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 31: (FT) Frequency of Incidental Histology
+    diagnosis in patients aged 45 years and younger with TC </summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_histology_45younger-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 32: (FT) Frequency of Incidental Histology
     diagnosis in patients with TC and tumor size \>10mm </summary>
     
     <p>
@@ -471,7 +579,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 27: (FT) Frequency of Incidental Histology
+    <summary> Suppl. Figure 33: (FT) Frequency of Incidental Histology
     diagnosis in patients with TC and tumor size \<10mm </summary>
     
     <p>
@@ -486,7 +594,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 28: (FT) Frequency of Incidental Histology
+    <summary> Suppl. Figure 34: (FT) Frequency of Incidental Histology
     diagnosis in patients with TC from the USA </summary>
     
     <p>
@@ -501,7 +609,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 29: (FT) Frequency of Incidental Histology
+    <summary> Suppl. Figure 35: (FT) Frequency of Incidental Histology
     diagnosis in patients with TC from a non-USA country </summary>
     
     <p>
@@ -516,7 +624,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 30: (FT) Frequency of Incidental Histology
+    <summary> Suppl. Figure 36: (FT) Frequency of Incidental Histology
     diagnosis in patients with TC from population based studies
     </summary>
     
@@ -532,7 +640,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 31: (FT) Frequency of Incidental Histology
+    <summary> Suppl. Figure 37: (FT) Frequency of Incidental Histology
     diagnosis in patients with TC from non-population-based studies
     </summary>
     
@@ -548,11 +656,11 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
 
 ## Figure 3. Incidental diagnosis in patients with Thyroid Cancer by country
 
-> All analyses were performed with the Freeman-Tukey (FT) method
+***All analyses were performed with the Freeman-Tukey (FT) method***
 
 ![](Output%20Figures/summary_countries-1.svg)<!-- -->
 
-> Show supplementary figures used to generate Figure 3
+> **Show supplementary figures used to generate Figure 3**
 
 <details>
 
@@ -577,12 +685,87 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
     
     <details>
     
-    <summary> Suppl. Figure 32: (FT) Frequency of Incidental diagnosis
+    <summary> Suppl. Figure 38: (FT) Frequency of Incidental diagnosis
+    in all patients with TC from Argentina</summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_incidental_argentina-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 39: (FT) Frequency of Incidental diagnosis
+    in all patients with TC from Autralia</summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_incidental_australia-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 40: (FT) Frequency of Incidental diagnosis
+    in all patients with TC from Canada</summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_incidental_Canada-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 41: (FT) Frequency of Incidental diagnosis
+    in all patients with TC from Germany</summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_incidental_Germany-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 42: (FT) Frequency of Incidental diagnosis
     in all patients with TC from Italy</summary>
     
     <p>
     
     ![](Output%20Figures/ft_incidental_italy-1.svg)<!-- -->
+    
+    </p>
+    
+    </details>
+
+  - 
+    
+    <details>
+    
+    <summary> Suppl. Figure 43: (FT) Frequency of Incidental diagnosis
+    in all patients with TC from Spain</summary>
+    
+    <p>
+    
+    ![](Output%20Figures/ft_incidental_spain-1.svg)<!-- -->
     
     </p>
     
@@ -613,7 +796,7 @@ Oscar J. Ponce & Eddy Lincango-Naranjo
 
 <details>
 
-<summary> Suppl. Figure 32: (GLMM) Frequency of Incidental diagnosis in
+<summary> Suppl. Figure 44: (GLMM) Frequency of Incidental diagnosis in
 patients with TC </summary>
 
 <p>
@@ -626,7 +809,7 @@ patients with TC </summary>
 
 <details>
 
-<summary> Suppl. Figure 33: (GLMM) Frequency of Incidental diagnosis in
+<summary> Suppl. Figure 45: (GLMM) Frequency of Incidental diagnosis in
 Male patients with TC </summary>
 
 <p>
@@ -639,7 +822,7 @@ Male patients with TC </summary>
 
 <details>
 
-<summary> Suppl. Figure 34: (GLMM) Frequency of Incidental diagnosis in
+<summary> Suppl. Figure 46: (GLMM) Frequency of Incidental diagnosis in
 Female patients with TC </summary>
 
 <p>
@@ -652,7 +835,7 @@ Female patients with TC </summary>
 
 <details>
 
-<summary> Suppl. Figure 35: (GLMM) Frequency of Incidental diagnosis in
+<summary> Suppl. Figure 47: (GLMM) Frequency of Incidental diagnosis in
 patients with TC and tumor size \>10mm </summary>
 
 <p>
@@ -665,7 +848,7 @@ patients with TC and tumor size \>10mm </summary>
 
 <details>
 
-<summary> Suppl. Figure 36: (GLMM) Frequency of Incidental diagnosis in
+<summary> Suppl. Figure 48: (GLMM) Frequency of Incidental diagnosis in
 patients with TC and tumor size \<10mm </summary>
 
 <p>
@@ -678,7 +861,7 @@ patients with TC and tumor size \<10mm </summary>
 
 <details>
 
-<summary> Suppl. Figure 37: (GLMM) Frequency of Incidental diagnosis in
+<summary> Suppl. Figure 49: (GLMM) Frequency of Incidental diagnosis in
 patients with TC from the USA </summary>
 
 <p>
@@ -691,7 +874,7 @@ patients with TC from the USA </summary>
 
 <details>
 
-<summary> Suppl. Figure 38: (GLMM) Frequency of Incidental diagnosis in
+<summary> Suppl. Figure 50: (GLMM) Frequency of Incidental diagnosis in
 patients with TC from a non-USA country </summary>
 
 <p>
@@ -704,7 +887,7 @@ patients with TC from a non-USA country </summary>
 
 <details>
 
-<summary> Suppl. Figure 39: (GLMM) Frequency of Incidental diagnosis in
+<summary> Suppl. Figure 51: (GLMM) Frequency of Incidental diagnosis in
 patients with TC from population based studies </summary>
 
 <p>
@@ -717,7 +900,7 @@ patients with TC from population based studies </summary>
 
 <details>
 
-<summary> Suppl. Figure 40: (GLMM) Frequency of Incidental diagnosis in
+<summary> Suppl. Figure 52: (GLMM) Frequency of Incidental diagnosis in
 patients with TC from non-population-based studies </summary>
 
 <p>
@@ -734,7 +917,7 @@ patients with TC from non-population-based studies </summary>
 
 <details>
 
-<summary> Suppl. Figure 41: (GLMM) Frequency of Incidental diagnosis in
+<summary> Suppl. Figure 53: (GLMM) Frequency of Incidental diagnosis in
 patients with TC </summary>
 
 <p>
@@ -747,7 +930,7 @@ patients with TC </summary>
 
 <details>
 
-<summary> Suppl. Figure 42: (GLMM) Frequency of Incidental imaging
+<summary> Suppl. Figure 54: (GLMM) Frequency of Incidental imaging
 diagnosis in Male patients with TC </summary>
 
 <p>
@@ -760,7 +943,7 @@ diagnosis in Male patients with TC </summary>
 
 <details>
 
-<summary> Suppl. Figure 43: (GLMM) Frequency of Incidental imaging
+<summary> Suppl. Figure 55: (GLMM) Frequency of Incidental imaging
 diagnosis in Female patients with TC </summary>
 
 <p>
@@ -773,7 +956,7 @@ diagnosis in Female patients with TC </summary>
 
 <details>
 
-<summary> Suppl. Figure 44: (GLMM) Frequency of Incidental imaging
+<summary> Suppl. Figure 56: (GLMM) Frequency of Incidental imaging
 diagnosis in patients with TC and tumor size \>10mm </summary>
 
 <p>
@@ -786,7 +969,7 @@ diagnosis in patients with TC and tumor size \>10mm </summary>
 
 <details>
 
-<summary> Suppl. Figure 45: (GLMM) Frequency of Incidental imaging
+<summary> Suppl. Figure 57: (GLMM) Frequency of Incidental imaging
 diagnosis in patients with TC and tumor size \<10mm </summary>
 
 <p>
@@ -799,7 +982,7 @@ diagnosis in patients with TC and tumor size \<10mm </summary>
 
 <details>
 
-<summary> Suppl. Figure 46: (GLMM) Frequency of Incidental imaging
+<summary> Suppl. Figure 58: (GLMM) Frequency of Incidental imaging
 diagnosis in patients with TC from the USA </summary>
 
 <p>
@@ -812,7 +995,7 @@ diagnosis in patients with TC from the USA </summary>
 
 <details>
 
-<summary> Suppl. Figure 47: (GLMM) Frequency of Incidental imaging
+<summary> Suppl. Figure 59: (GLMM) Frequency of Incidental imaging
 diagnosis in patients with TC from a non-USA country </summary>
 
 <p>
@@ -825,7 +1008,7 @@ diagnosis in patients with TC from a non-USA country </summary>
 
 <details>
 
-<summary> Suppl. Figure 48: (GLMM) Frequency of Incidental imaging
+<summary> Suppl. Figure 60: (GLMM) Frequency of Incidental imaging
 diagnosis in patients with TC from population based studies </summary>
 
 <p>
@@ -838,7 +1021,7 @@ diagnosis in patients with TC from population based studies </summary>
 
 <details>
 
-<summary> Suppl. Figure 49: (GLMM) Frequency of Incidental imaging
+<summary> Suppl. Figure 61: (GLMM) Frequency of Incidental imaging
 diagnosis in patients with TC from non-population-based studies
 </summary>
 
@@ -856,7 +1039,7 @@ diagnosis in patients with TC from non-population-based studies
 
 <details>
 
-<summary> Suppl. Figure 50: (GLMM) Frequency of Incidental Ultrasound
+<summary> Suppl. Figure 62: (GLMM) Frequency of Incidental Ultrasound
 diagnosis in patients with TC </summary>
 
 <p>
@@ -873,7 +1056,7 @@ diagnosis in patients with TC </summary>
 
 <details>
 
-<summary> Suppl. Figure 51: (GLMM) Frequency of Incidental Computed
+<summary> Suppl. Figure 63: (GLMM) Frequency of Incidental Computed
 Tomography Scan diagnosis in patients with TC </summary>
 
 <p>
@@ -890,7 +1073,7 @@ Tomography Scan diagnosis in patients with TC </summary>
 
 <details>
 
-<summary> Suppl. Figure 52: (GLMM) Frequency of Incidental Positron
+<summary> Suppl. Figure 64: (GLMM) Frequency of Incidental Positron
 Emission Tomography diagnosis in patients with TC </summary>
 
 <p>
@@ -907,7 +1090,7 @@ Emission Tomography diagnosis in patients with TC </summary>
 
 <details>
 
-<summary> Suppl. Figure 53: (GLMM) Frequency of Incidental Magnetic
+<summary> Suppl. Figure 65: (GLMM) Frequency of Incidental Magnetic
 Resonance Imaging diagnosis in patients with TC </summary>
 
 <p>
@@ -924,7 +1107,7 @@ Resonance Imaging diagnosis in patients with TC </summary>
 
 <details>
 
-<summary> Suppl. Figure 54: (GLMM) Frequency of Incidental histology
+<summary> Suppl. Figure 66: (GLMM) Frequency of Incidental histology
 diagnosis in patients with TC </summary>
 
 <p>
@@ -937,7 +1120,7 @@ diagnosis in patients with TC </summary>
 
 <details>
 
-<summary> Suppl. Figure 55: (GLMM) Frequency of Incidental histology
+<summary> Suppl. Figure 67: (GLMM) Frequency of Incidental histology
 diagnosis in Male patients with TC </summary>
 
 <p>
@@ -950,7 +1133,7 @@ diagnosis in Male patients with TC </summary>
 
 <details>
 
-<summary> Suppl. Figure 56: (GLMM) Frequency of Incidental Histology
+<summary> Suppl. Figure 68: (GLMM) Frequency of Incidental Histology
 diagnosis in Female patients with TC </summary>
 
 <p>
@@ -963,7 +1146,7 @@ diagnosis in Female patients with TC </summary>
 
 <details>
 
-<summary> Suppl. Figure 57: (GLMM) Frequency of Incidental Histology
+<summary> Suppl. Figure 69: (GLMM) Frequency of Incidental Histology
 diagnosis in patients with TC and tumor size \>10mm </summary>
 
 <p>
@@ -976,7 +1159,7 @@ diagnosis in patients with TC and tumor size \>10mm </summary>
 
 <details>
 
-<summary> Suppl. Figure 58: (GLMM) Frequency of Incidental Histology
+<summary> Suppl. Figure 70: (GLMM) Frequency of Incidental Histology
 diagnosis in patients with TC and tumor size \<10mm </summary>
 
 <p>
@@ -989,7 +1172,7 @@ diagnosis in patients with TC and tumor size \<10mm </summary>
 
 <details>
 
-<summary> Suppl. Figure 59: (GLMM) Frequency of Incidental Histology
+<summary> Suppl. Figure 71: (GLMM) Frequency of Incidental Histology
 diagnosis in patients with TC from the USA </summary>
 
 <p>
@@ -1002,7 +1185,7 @@ diagnosis in patients with TC from the USA </summary>
 
 <details>
 
-<summary> Suppl. Figure 60: (GLMM) Frequency of Incidental Histology
+<summary> Suppl. Figure 72: (GLMM) Frequency of Incidental Histology
 diagnosis in patients with TC from a non-USA country </summary>
 
 <p>
@@ -1015,7 +1198,7 @@ diagnosis in patients with TC from a non-USA country </summary>
 
 <details>
 
-<summary> Suppl. Figure 61: (GLMM) Frequency of Incidental Histology
+<summary> Suppl. Figure 73: (GLMM) Frequency of Incidental Histology
 diagnosis in patients with TC from population based studies </summary>
 
 <p>
@@ -1028,7 +1211,7 @@ diagnosis in patients with TC from population based studies </summary>
 
 <details>
 
-<summary> Suppl. Figure 62: (GLMM) Frequency of Incidental Histology
+<summary> Suppl. Figure 74: (GLMM) Frequency of Incidental Histology
 diagnosis in patients with TC from non-population-based studies
 </summary>
 
@@ -1042,7 +1225,7 @@ diagnosis in patients with TC from non-population-based studies
 
 <details>
 
-<summary> Suppl. Figure 63: (FT) Frequency of Incidental diagnosis in
+<summary> Suppl. Figure 75: (FT) Frequency of Incidental diagnosis in
 patients with TC </summary>
 
 <p>
@@ -1051,7 +1234,7 @@ patients with TC </summary>
 
 <details>
 
-<summary> Suppl. Figure 64: (GLMM) Frequency of Incidental Histology
+<summary> Suppl. Figure 76: (GLMM) Frequency of Incidental Histology
 diagnosis in patients with TC from non-population-based studies
 </summary>
 
