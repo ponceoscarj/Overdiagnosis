@@ -1,0 +1,1742 @@
+# Packages ----------------------------------------------------------------
+
+library("metafor")
+library("tidyverse")
+library("rmarkdown")
+library("magrittr")
+library("forestplot")
+library(DescTools)
+library(lattice)
+library(gt)
+
+
+# Ovid search strategy as PNG----------------------------------------------------
+ovid <- read.csv("2 Search strategy/ovid_search.csv")
+names(ovid)[1] <- "line"
+names(ovid)[2] <- "terms"
+
+ovid <- as_tibble(ovid)
+
+ovid <- 
+  ovid %>%
+  gt(
+    rowname_col = "row",
+    groupname_col = "group"
+  )   %>%
+  fmt_markdown(columns = TRUE)
+
+
+ovid2 <- 
+  ovid %>%
+  tab_header( 
+    title = md("**Ovid Search**"),
+    subtitle = md("Embase 1974 to 2020 June 02, Ovid MEDLINE(R) and Epub Ahead of Print, In-Process & Other Non-Indexed Citations and Daily 1946 to June 02, 2020 
+Search Strategy")
+  ) %>%
+  tab_options( 
+    data_row.padding = px(5)
+  ) %>%
+  cols_align(
+    align = "left",
+    columns = TRUE
+  ) %>%
+  fmt_number( 
+    columns = vars("line"),
+    decimals = 0
+  ) %>%
+  fmt_passthrough(
+    columns = vars("terms"),
+  ) %>%
+  
+  cols_label(
+    line = md("**Search <br> line**"),
+    terms = md("**Search <br> terms**")
+  ) 
+
+
+gtsave(ovid2, "ovid.png")
+invisible(file.remove("ovid.png"))
+
+
+
+# SCOPUS search strategy as PNG -------------------------------------------
+scopus <- read.csv("2 Search strategy/scopus_search.csv")
+names(scopus)[1] <- "line"
+names(scopus)[2] <- "terms"
+
+ovid <- as_tibble(scopus)
+
+scopus <- scopus %>% 
+  gt() %>%
+  tab_header( 
+    title = md("**Scopus Search**"),
+  ) %>%
+  cols_align(
+    align = "left",
+    columns = TRUE
+  ) %>%
+  fmt_number( 
+    columns = vars("line"),
+    decimals = 0
+  ) %>%
+  fmt_passthrough(
+    columns = vars("terms"),
+  ) %>%
+  cols_label(
+    line = md("**Search <br> line**"),
+    terms = md("**Search <br> terms**"),
+  ) %>%
+  tab_options(
+    column_labels.border.bottom.width = 0.5,
+    data_row.padding = px(4)
+  )%>%
+  tab_options(
+    column_labels.border.bottom.width = 0.5,
+    column_labels.border.top.width = 0.5,
+    table.font.size = "small",
+    
+    data_row.padding = px(5)
+  )
+
+gtsave(scopus, "scopus.png")
+invisible(file.remove("scopus.png"))
+
+
+# Cleaning ----------------------------------------------------------------
+od <- read.csv("4 Data/overdiagnosis_excel.csv")
+
+names(od)[2] <- "study"
+names(od)[11] <- "tumorsize"
+names(od)[13] <- "sex"
+names(od)[26] <- "totalparticipants"
+names(od)[28] <- "imaging"
+names(od)[29] <- "us"
+names(od)[30] <- "tac"
+names(od)[31] <- "pet"
+names(od)[32] <- "mri"
+names(od)[34] <- "histology"
+names(od)[44] <- "uscountry"
+names(od)[45] <- "popbased"
+
+
+# Functions ---------------------------------------------------------------
+
+round2 = function(x, n=0) {scale<-10^n; sign(x)*trunc(abs(x)*scale+0.5)/scale}
+
+ft <- function(database){
+  db <- database
+  db <- escalc(measure="PFT", xi=x, ni=n, data=db)
+  db <- db[order(db$yi),]
+  
+  db$est <-  transf.ipft(db$yi, db$n)
+  db$lwr.ci <- transf.ipft(db$yi - 1.96*sqrt(db$vi), db$n)
+  db$upr.ci <- transf.ipft(db$yi + 1.96*sqrt(db$vi), db$n)
+  
+  
+  db$rate <- paste(db$x,"/",db$n)
+  db$prop <- paste(formatC(db$est, format='f', digits =2)," ",
+                   "(",formatC(db$lwr.ci, format='f', digits =2),
+                   "-",formatC(db$upr.ci, format='f', digits=2),")")  
+  
+  ma <- rma(db$yi, db$vi, method="DL", data=db)
+  exp <- predict(ma, transf=transf.ipft.hm, targs=list(ni=db$n))
+  
+  list(pre = db, ma = ma, exp = exp)
+}
+
+glmm <- function(database){
+  db <- database
+  ma <- rma.glmm(measure="PLO", xi=x, ni=n, 
+                 data=db)
+  exp <- predict(ma, transf=transf.ilogit, digits=3)   
+  db$est <-  transf.ilogit(ma$yi, db$n)
+  db$lwr.ci <- transf.ilogit(ma$yi - 1.96*sqrt(ma$vi), db$n)
+  db$upr.ci <- transf.ilogit(ma$yi + 1.96*sqrt(ma$vi), db$n)
+  db$rate <- paste(db$x,"/",db$n)
+  db$prop <- paste(formatC(db$est, format='f', digits =2)," ",
+                   "(",formatC(db$lwr.ci, format='f', digits =2),
+                   "-",formatC(db$upr.ci, format='f', digits=2),")")   
+  db <- db[order(db$est),]
+  list(pre = db, ma = ma, exp = exp)
+}
+
+subgroup_interaction <- function(group1, group2, name1, name2){
+  
+  x <- data.frame(estimate = c(coef(group1$ma), coef(group2$ma)), 
+                  stderror = c(group1$ma$se, group2$ma$se),
+                  meta = c(name1, name2), 
+                  tau2 = round(c(group1$ma$tau2, group2$ma$tau2),3))
+  
+  subgroup_test <- rma(estimate, sei=stderror, mods = ~ meta, 
+                       method="FE", data=x, digits=3)
+}
+
+
+table_singleproportion_ft <- function (xi, ni, analysis){
+  b <- cbind(
+    c("Author", analysis$pre$study),
+    c("Frequency (n/N)", analysis$pre$rate),
+    c("Prevalence (95% CI)", analysis$pre$prop))
+  
+  
+  b <- rbind(b, NA)
+  b <- as_tibble(b, .name_repair = "unique")
+  b <- b %>% add_row(.before = (nrow(b)-1))
+  
+  c <- structure(list(
+    mean = c(NA, NA, analysis$pre$est, NA),
+    lower = c(NA, NA,  analysis$pre$lwr.ci, NA),
+    upper = c(NA, NA,  analysis$pre$upr.ci, NA)),
+    .Names = c("mean", "lower", "upper"),
+    row.names = c(NA, (-1L*nrow(b))),
+    class = "data.frame")
+  
+  
+  list(b = b, c = c)
+}
+
+
+
+tables_proportion_ft <- function(xi, ni, analysis,tumorsize = NA){
+  ifelse(is.na(tumorsize),  
+         (b <- cbind( 
+           c("Author", analysis$pre$study, 
+             paste("Overall proportion for", analysis$ma$k.eff, "studies","\n", 
+                   "(Tau^2 = ", (formatC(analysis$ma$tau2, digits=2, format="f")), ", df = ", 
+                   (analysis$ma$k - analysis$ma$p),
+                   ", p ", (ifelse(analysis$ma$QEp < 0.001, 
+                                   paste("< 0.001"),
+                                   paste("= ", formatC(analysis$ma$QEp, digits=3, format="f")))),
+                   "; ", "I^2", " = ", (formatC(analysis$ma$I2, digits=1, format="f")), "%)")),
+           c("Frequency (n/N)",analysis$pre$rate, paste(sum(xi), " / ",
+                                                        sum(ni))),
+           c("Prevalence (95% CI)", analysis$pre$prop, 
+             paste(formatC(analysis$exp$pred, format='f', digits =2), 
+                   " (",formatC(analysis$exp$ci.lb, format='f', digits=2),
+                   "-", formatC(analysis$exp$ci.ub, format='f', digits=2), ")")))),
+         (b <- cbind( 
+           c("Author", analysis$pre$study, 
+             paste("Overall proportion for", analysis$ma$k.eff, "studies","\n", 
+                   "(Tau^2 = ", (formatC(analysis$ma$tau2, digits=2, format="f")), ", df = ", 
+                   (analysis$ma$k - analysis$ma$p),
+                   ", p ", (ifelse(analysis$ma$QEp < 0.001, 
+                                   paste("< 0.001"),
+                                   paste("= ", formatC(analysis$ma$QEp, digits=3, format="f")))),
+                   "; ", "I^2", " = ", (formatC(analysis$ma$I2, digits=1, format="f")), "%)")),
+           c("Tumor size (mm)", analysis$pre$tumorsize, NA),
+           c("Frequency (n/N)",analysis$pre$rate, paste(sum(xi), " / ",
+                                                        sum(ni))),
+           c("Prevalence (95% CI)", analysis$pre$prop, 
+             paste(formatC(analysis$exp$pred, format='f', digits =2), 
+                   " (",formatC(analysis$exp$ci.lb, format='f', digits=2),
+                   "-", formatC(analysis$exp$ci.ub, format='f', digits=2), ")")))))
+  
+  b <- rbind(b, NA)
+  b <- as_tibble(b, .name_repair = "unique")
+  b <- b %>% add_row(.before = (nrow(b)-1))
+  
+  c <- structure(list(
+    mean = c(NA,  analysis$pre$est, NA, analysis$exp$pred, NA),
+    lower = c(NA,   analysis$pre$lwr.ci, NA, analysis$exp$ci.lb, NA),
+    upper = c(NA,   analysis$pre$upr.ci, NA, analysis$exp$ci.ub, NA)),
+    .Names = c("mean", "lower", "upper"),
+    row.names = c(NA, (-1L*nrow(b))),
+    class = "data.frame")
+  
+  
+  list(b = b, c = c)
+  
+}
+
+
+tables_proportion_glmm <- function(xi, ni, analysis, tumorsize = NA){
+  ifelse(is.na(tumorsize),
+         
+         (b <- cbind( 
+           c("Author", analysis$pre$study, 
+             paste("Overall proportion for", analysis$ma$k.eff, "studies","\n", 
+                   "(Tau^2 = ", (formatC(analysis$ma$tau2, digits=2, format="f")), ", df = ", 
+                   (analysis$ma$k - analysis$ma$p),
+                   ", p ", (ifelse(analysis$ma$QEp.Wld < 0.001, 
+                                   paste("< 0.001"),
+                                   paste("= ", formatC(analysis$ma$QEp.Wld, digits=3, format="f")))),
+                   "; ", "I^2", " = ", (formatC(analysis$ma$I2, digits=1, format="f")), "%)")),
+           c("Frequency (n/N)",analysis$pre$rate, paste(sum(xi), " / ",
+                                                        sum(ni))),
+           c("Prevalence (95% CI)", analysis$pre$prop, 
+             paste(formatC(analysis$exp$pred, format='f', digits =2), 
+                   " (",formatC(analysis$exp$ci.lb, format='f', digits=2),
+                   "-", formatC(analysis$exp$ci.ub, format='f', digits=2), ")")))),
+         (b <- cbind( 
+           c("Author", analysis$pre$study, 
+             paste("Overall proportion for", analysis$ma$k.eff, "studies","\n", 
+                   "(Tau^2 = ", (formatC(analysis$ma$tau2, digits=2, format="f")), ", df = ", 
+                   (analysis$ma$k - analysis$ma$p),
+                   ", p ", (ifelse(analysis$ma$QEp.Wld < 0.001, 
+                                   paste("< 0.001"),
+                                   paste("= ", formatC(analysis$ma$QEp.Wld, digits=3, format="f")))),
+                   "; ", "I^2", " = ", (formatC(analysis$ma$I2, digits=1, format="f")), "%)")),
+           c("Tumor size (mm)", analysis$pre$tumorsize, NA),
+           c("Frequency (n/N)",analysis$pre$rate, paste(sum(xi), " / ",
+                                                        sum(ni))),
+           c("Prevalence (95% CI)", analysis$pre$prop, 
+             paste(formatC(analysis$exp$pred, format='f', digits =2), 
+                   " (",formatC(analysis$exp$ci.lb, format='f', digits=2),
+                   "-", formatC(analysis$exp$ci.ub, format='f', digits=2), ")")))))
+  
+  b <- rbind(b, NA)
+  b <- as_tibble(b, .name_repair = "unique")
+  b <- b %>% add_row(.before = (nrow(b)-1))
+  
+  c <- structure(list(
+    mean = c(NA,  analysis$pre$est, NA, analysis$exp$pred, NA),
+    lower = c(NA,   analysis$pre$lwr.ci, NA, analysis$exp$ci.lb, NA),
+    upper = c(NA,   analysis$pre$upr.ci, NA, analysis$exp$ci.ub, NA)),
+    .Names = c("mean", "lower", "upper"),
+    row.names = c(NA, (-1L*nrow(b))),
+    class = "data.frame")
+  
+  
+  list(b = b, c = c)
+  
+}
+
+
+plot_single_proportion_ft <- function(words, numbers, overall_box){
+  
+  
+  forestplot(words,
+             graph.pos = ncol(words),
+             zero = NA,
+             numbers,
+             new_page = TRUE,
+             colgap = unit(5, "mm"),
+             hrzl_lines = list("2" = gpar (lwd=1, columns=c(1:4), col="black")),
+             lineheight=unit(0.5,'cm'),
+             boxsize = c(NA, NA, overall_box, NA),
+             line.margin = 2,
+             is.summary = c(T, F, T, F),
+             align = c("l","c"),
+             ci.vertices = TRUE,
+             txt_gp = fpTxtGp(label =gpar (cex=0.8), 
+                              ticks = gpar(cex = 0.8, fontface="bold"),
+                              summary = gpar(cex = 0.8),
+                              xlab = gpar(cex=0.8)),
+             xticks = c(0, 0.1, 0.2, 0.3, 0.4,0.5, 0.6, 0.7, 0.8, 0.9, 1),
+             xlog=FALSE,
+             clip = c(0,  0.4),
+             grid = gpar(lty=3, col="gray"),
+             lwd.xaxis = 1,
+             lwd.ci = 2.2,
+             graphwidth = unit(10,"cm"),
+             col=fpColors(box="black",line="grey", axes="grey20", summary="black"))
+}
+
+
+
+plot_individual_proportion_ft <- function(words, numbers, sizebox, box_ma_results, overall_box){
+  
+  box_size <- (sizebox*(weights(box_ma_results)))
+  
+  forestplot(words,
+             graph.pos = ncol(words),
+             zero = NA,
+             numbers,
+             new_page = TRUE,
+             colgap = unit(5, "mm"),
+             hrzl_lines = list("2" = gpar (lwd=1, columns=c(1:4), col="black")),
+             lineheight=unit(0.5,'cm'),
+             boxsize = c(NA, box_size, NA, overall_box, NA),
+             line.margin = 2,
+             is.summary = c(T, rep(F, nrow(words)-3), T, F),
+             align = c("l","c"),
+             ci.vertices = TRUE,
+             txt_gp = fpTxtGp(label =gpar (cex=0.8), 
+                              ticks = gpar(cex = 0.8, fontface="bold"),
+                              summary = gpar(cex = 0.8),
+                              xlab = gpar(cex=0.8)),
+             xticks = c(0, 0.1, 0.2, 0.3, 0.4,0.5, 0.6, 0.7, 0.8, 0.9, 1),
+             xlog=FALSE,
+             clip = c(0,  0.4),
+             grid = gpar(lty=3, col="gray"),
+             lwd.xaxis = 1,
+             lwd.ci = 2.2,
+             graphwidth = unit(10,"cm"),
+             col=fpColors(box="black",line="grey", axes="grey20", summary="black"))
+}
+
+
+
+
+plot_individual_proportion_glmm <- function(words, numbers, ind_box, overall_box){
+  
+  forestplot(words,
+             graph.pos = ncol(words),
+             zero = NA,
+             numbers,
+             new_page = TRUE,
+             colgap = unit(5, "mm"),
+             hrzl_lines = list("2" = gpar (lwd=1, columns=c(1:4), col="black")),
+             lineheight=unit(0.5,'cm'),
+             line.margin = 2,
+             boxsize = c(rep(ind_box, nrow(words)-2), overall_box, NA),
+             is.summary = c(T, rep(F, nrow(words)-3), T, F),
+             align = c("l","c"),
+             ci.vertices = TRUE,
+             txt_gp = fpTxtGp(label =gpar (cex=0.8), 
+                              ticks = gpar(cex = 0.8, fontface="bold"),
+                              summary = gpar(cex = 0.8),
+                              xlab = gpar(cex=0.8)),
+             xticks = c(0, 0.1, 0.2, 0.3, 0.4,0.5, 0.6, 0.7, 0.8, 0.9, 1),
+             xlog=FALSE,
+             clip = c(0,  0.4),
+             grid = gpar(lty=3, col="gray"),
+             lwd.xaxis = 1,
+             lwd.ci = 2.2,
+             graphwidth = unit(10,"cm"),
+             col=fpColors(box="black",line="grey", axes="grey20", summary="black"))
+  
+}  
+
+
+extract_info_maft_proportions <- function(group, maresults, subgroup = NA, sub_analysis){
+  ifelse(is.na(subgroup),
+         a <- c(paste(group),
+                maresults$ma[[15]],
+                sum(maresults$pre$x),
+                sum(maresults$pre$n),
+                maresults$ma[[25]],
+                maresults$exp[[1]], 
+                maresults$exp[[3]], 
+                maresults$exp[[4]],
+                NA),
+         a <- c(paste(group),
+                maresults$ma[[15]],
+                sum(maresults$pre$x),
+                sum(maresults$pre$n),
+                maresults$ma[[25]],
+                maresults$exp[[1]], 
+                maresults$exp[[3]], 
+                maresults$exp[[4]],
+                sub_analysis[[24]]))
+  
+  return(a)
+}
+
+
+extract_info_maglmm_proportions <- function(group, maresults, subgroup = NA, sub_analysis){
+  ifelse(is.na(subgroup),
+         a <- c(paste(group),
+                maresults$ma[[15]],
+                sum(maresults$pre$x),
+                sum(maresults$pre$n),
+                maresults$ma[[28]],
+                maresults$exp[[1]], 
+                maresults$exp[[3]], 
+                maresults$exp[[4]],
+                NA),
+         a <- c(paste(group),
+                maresults$ma[[15]],
+                sum(maresults$pre$x),
+                sum(maresults$pre$n),
+                maresults$ma[[28]],
+                maresults$exp[[1]], 
+                maresults$exp[[3]], 
+                maresults$exp[[4]],
+                sub_analysis[[24]]))
+  
+  return(a)
+}
+
+
+
+# Meta analyses Incidental -----------------------------------------------------------
+od1 <- od
+names(od1)[names(od1) == "inc"] <- "x"
+names(od1)[names(od1) == "totalparticipants"] <- "n"
+
+
+inc_overall <- subset(od1, overall=="Yes" & !is.na(x))
+inc1 <- ft(inc_overall)
+inc2 <- glmm(inc_overall)
+
+inc_male <- subset(od1, sex=="Male" & !is.na(x))
+inc3 <- ft(inc_male)
+inc4 <- glmm(inc_male)
+
+inc_female <- subset(od1, sex=="Female" & !is.na(x))
+inc5 <- ft(inc_female)
+inc6 <- glmm(inc_female)
+
+inc_sex_ft <- subgroup_interaction(inc3, inc5, "Male", "Female")
+inc_sex_glmm <- subgroup_interaction(inc4, inc6, "Male", "Female")
+
+
+inc_more45 <- subset(od1, age2==">45" & !is.na(x))
+inc7 <- ft(inc_more45)
+#not feasible, only 1 study
+#inc8 <- glmm(inc_more45)
+
+inc_less45 <- subset(od1, age2=="<45" & !is.na(x))
+inc9 <- ft(inc_less45)
+#not feasible, only 1 study
+#i10 <- glmm(inc_less45)
+
+inc_age_ft <- subgroup_interaction(inc7, inc9, ">45", "<45")
+
+
+inc_more10 <- subset(od1, tumor1==">10" & !is.na(x))
+inc11 <- ft(inc_more10)
+inc12 <- glmm(inc_more10)
+
+inc_less10 <- subset(od1, tumor1=="<10" & !is.na(x))
+inc13 <- ft(inc_less10)
+inc14 <- glmm(inc_less10)
+
+inc_tumorsize_ft <- subgroup_interaction(inc11, inc13, ">10", "<10")
+inc_tumorsize_glmm <- subgroup_interaction(inc12, inc14, ">10", "<10")
+
+
+inc_usa <- subset(od1, uscountry=="USA" & overall=="Yes" & !is.na(x))
+inc15 <- ft(inc_usa)
+inc16 <- glmm(inc_usa)
+
+inc_nonusa <- subset(od1, uscountry=="non-USA" & overall=="Yes" & !is.na(x))
+inc17 <- ft(inc_nonusa)
+inc18 <- glmm(inc_nonusa)
+
+inc_uscountry_ft <- subgroup_interaction(inc15, inc17, "USA", "non-USA")
+inc_uscountry_glmm <- subgroup_interaction(inc16, inc18, "USA", "non-USA")
+
+
+inc_pop <- subset(od1, popbased=="Population based studies" & overall=="Yes" & !is.na(x))
+inc19 <- ft(inc_pop)
+inc20 <- glmm(inc_pop)
+
+inc_nonpop <- subset(od1, popbased=="Non-population based studies" & overall=="Yes" 
+                     & !is.na(x))
+inc21 <- ft(inc_nonpop)
+inc22 <- glmm(inc_nonpop)
+
+inc_popbased_ft <- subgroup_interaction(inc19, inc21, "Population based", "Non-population based")
+inc_popbased_glmm <- subgroup_interaction(inc20, inc22, "Population based", "Non-population based")
+
+
+# Meta analyses imaging ---------------------------------------------------
+od2 <- od
+names(od2)[names(od2) == "imaging"] <- "x"
+names(od2)[names(od2) == "totalparticipants"] <- "n"
+
+i_overall <- subset(od2, overall=="Yes" & !is.na(x))
+i1 <- ft(i_overall)
+i2 <- glmm(i_overall)
+
+i_male <- subset(od2, sex=="Male" & !is.na(x))
+i3 <- ft(i_male)
+i4 <- glmm(i_male)
+
+i_female <- subset(od2, sex=="Female" & !is.na(x))
+i5 <- ft(i_female)
+i6 <- glmm(i_female)
+
+i_sex_ft <- subgroup_interaction(i3, i5, "Male", "Female")
+i_sex_glmm <- subgroup_interaction(i4, i6, "Male", "Female")
+
+
+i_more45 <- subset(od2, age2==">45" & !is.na(x))
+i7 <- ft(i_more45)
+#not feasible, only 1 study
+#i8 <- glmm(i_more45)
+
+i_less45 <- subset(od2, age2=="<45" & !is.na(x))
+i9 <- ft(i_less45)
+#not feasible, only 1 study
+#i10 <- glmm(i_less45)
+
+i_age_ft <- subgroup_interaction(i7, i9, ">45", "<45")
+
+
+i_more10 <- subset(od2, tumor1==">10" & !is.na(x))
+i11 <- ft(i_more10)
+i12 <- glmm(i_more10)
+
+i_less10 <- subset(od2, tumor1=="<10" & !is.na(x))
+i13 <- ft(i_less10)
+i14 <- glmm(i_less10)
+
+i_tumorsize_ft <- subgroup_interaction(i11, i13, ">10", "<10")
+i_tumorsize_glmm <- subgroup_interaction(i12, i14, ">10", "<10")
+
+
+i_usa <- subset(od2, uscountry=="USA" & overall=="Yes" & !is.na(x))
+i15 <- ft(i_usa)
+i16 <- glmm(i_usa)
+
+i_nonusa <- subset(od2, uscountry=="non-USA" & overall=="Yes" & !is.na(x))
+i17 <- ft(i_nonusa)
+i18 <- glmm(i_nonusa)
+
+i_uscountry_ft <- subgroup_interaction(i15, i17, "USA", "non-USA")
+i_uscountry_glmm <- subgroup_interaction(i16, i18, "USA", "non-USA")
+
+
+i_pop <- subset(od2, popbased=="Population based studies" & overall=="Yes" & !is.na(x))
+i19 <- ft(i_pop)
+i20 <- glmm(i_pop)
+
+i_nonpop <- subset(od2, popbased=="Non-population based studies" & overall=="Yes" 
+                   & !is.na(x))
+i21 <- ft(i_nonpop)
+i22 <- glmm(i_nonpop)
+
+i_popbased_ft <- subgroup_interaction(i19, i21, "Population based", "Non-population based")
+i_popbased_glmm <- subgroup_interaction(i20, i22, "Population based", "Non-population based")
+
+
+# Meta analyses US --------------------------------------------------------
+us_overall <- subset(od, overall=="Yes" & !is.na(us))
+names(us_overall)[names(us_overall) == "us"] <- "x"
+names(us_overall)[names(us_overall) == "totalparticipants"] <- "n"
+
+us1 <- ft(us_overall)
+us2 <- glmm(us_overall)
+
+
+# Meta analyses TAC -------------------------------------------------------
+tac_overall <- subset(od, overall=="Yes" & !is.na(tac))
+names(tac_overall)[names(tac_overall) == "tac"] <- "x"
+names(tac_overall)[names(tac_overall) == "totalparticipants"] <- "n"
+
+tac1 <- ft(tac_overall)
+tac2 <- glmm(tac_overall)
+
+```
+
+```{r analysis_pet, echo=FALSE, message=FALSE, warning=FALSE} 
+pet_overall <- subset(od, overall=="Yes" & !is.na(pet))
+names(pet_overall)[names(pet_overall) == "pet"] <- "x"
+names(pet_overall)[names(pet_overall) == "totalparticipants"] <- "n"
+
+pet1 <- ft(pet_overall)
+pet2 <- glmm(pet_overall)
+
+
+# Meta analyses MRI -------------------------------------------------------
+mri_overall <- subset(od, overall=="Yes" & !is.na(mri))
+names(mri_overall)[names(mri_overall) == "mri"] <- "x"
+names(mri_overall)[names(mri_overall) == "totalparticipants"] <- "n"
+
+mri1 <- ft(mri_overall)
+mri2 <- glmm(mri_overall)
+
+
+# Meta analyses Histology -------------------------------------------------
+od3 <- od
+names(od3)[names(od3) == "histology"] <- "x"
+names(od3)[names(od3) == "totalparticipants"] <- "n"
+
+hist_overall <- subset(od3, overall=="Yes" & !is.na(x))
+hist1 <- ft(hist_overall)
+hist2 <- glmm(hist_overall)
+
+hist_male <- subset(od3, sex=="Male" & !is.na(x))
+hist3 <- ft(hist_male)
+hist4 <- glmm(hist_male)
+
+hist_female <- subset(od3, sex=="Female" & !is.na(x))
+hist5 <- ft(hist_female)
+hist6 <- glmm(hist_female)
+
+hist_sex_ft <- subgroup_interaction(hist3, hist5, "Male", "Female")
+hist_sex_glmm <- subgroup_interaction(hist4, hist6, "Male", "Female")
+
+
+hist_more45 <- subset(od3, age2==">45" & !is.na(x))
+hist7 <- ft(hist_more45)
+#not feasible, only 1 study
+#hist8 <- glmm(hist_more45)
+
+hist_less45 <- subset(od3, age2=="<45" & !is.na(x))
+hist9 <- ft(hist_less45)
+#not feasible, only 1 study
+#i10 <- glmm(hist_less45)
+
+hist_age_ft <- subgroup_interaction(hist7, hist9, ">45", "<45")
+
+
+hist_more10 <- subset(od3, tumor1==">10" & !is.na(x))
+hist11 <- ft(hist_more10)
+hist12 <- glmm(hist_more10)
+
+hist_less10 <- subset(od3, tumor1=="<10" & !is.na(x))
+hist13 <- ft(hist_less10)
+hist14 <- glmm(hist_less10)
+
+hist_tumorsize_ft <- subgroup_interaction(i11, i13, ">10", "<10")
+hist_tumorsize_glmm <- subgroup_interaction(i12, i14, ">10", "<10")
+
+
+hist_usa <- subset(od3, uscountry=="USA" & overall=="Yes" & !is.na(x))
+hist15 <- ft(hist_usa)
+hist16 <- glmm(hist_usa)
+
+hist_nonusa <- subset(od3, uscountry=="non-USA" & overall=="Yes" & !is.na(x))
+hist17 <- ft(hist_nonusa)
+hist18 <- glmm(hist_nonusa)
+
+hist_uscountry_ft <- subgroup_interaction(hist15, hist17, "USA", "non-USA")
+hist_uscountry_glmm <- subgroup_interaction(hist16, hist18, "USA", "non-USA")
+
+
+hist_pop <- subset(od3, popbased=="Population based studies" & overall=="Yes" & !is.na(x))
+hist19 <- ft(hist_pop)
+hist20 <- glmm(hist_pop)
+
+hist_nonpop <- subset(od3, popbased=="Non-population based studies" & overall=="Yes" 
+                      & !is.na(x))
+hist21 <- ft(hist_nonpop)
+hist22 <- glmm(hist_nonpop)
+
+hist_popbased_ft <- subgroup_interaction(hist19, hist21, "Population based", "Non-population based")
+hist_popbased_glmm <- subgroup_interaction(hist20, hist22, "Population based", "Non-population based")
+
+
+# Meta analyses non-incidental --------------------------------------------
+od4 <- od
+names(od4)[names(od4) == "noninc"] <- "x"
+names(od4)[names(od4) == "totalparticipants"] <- "n"
+
+
+noninc_overall <- subset(od4, overall=="Yes" & !is.na(x))
+noninc1 <- ft(inc_overall)
+noninc2 <- glmm(inc_overall)
+
+
+
+# Meta-analysis incidental countries --------------------------------------
+od5 <- od
+names(od5)[names(od5) == "inc"] <- "x"
+names(od5)[names(od5) == "totalparticipants"] <- "n"
+
+inc_arg <- subset(od5, overall=="Yes" & !is.na(x) & country=="Argentina")
+arg1 <- ft(inc_arg)
+
+inc_aus <- subset(od5, overall=="Yes" & !is.na(x) & country=="Australia")
+aus1 <- ft(inc_aus)
+
+inc_can <- subset(od5, overall=="Yes" & !is.na(x) & country=="Canada")
+can1 <- ft(inc_can)
+
+inc_germ <- subset(od5, overall=="Yes" & !is.na(x) & country=="Germany")
+ger1 <- ft(inc_germ)
+
+inc_ita <- subset(od5, overall=="Yes" & !is.na(x) & country=="Italy")
+ita1 <- ft(inc_ita)
+
+inc_spa <- subset(od5, overall=="Yes" & !is.na(x) & country=="Spain")
+spa1 <- ft(inc_spa)
+
+
+
+# Overall figure in Freeman-Tukey ------------------------------------------------
+x <- rbind(
+  c( "subgroup", "studies", "n", "N", "i2", "est", "llci", "ulci", "p"),
+  c(NA),
+  extract_info_maft_proportions("Overall", inc1),
+  c(NA),
+  c("by Method of Diagnosis", rep(NA, 8)),
+  extract_info_maft_proportions("Imaging", i1),
+  extract_info_maft_proportions("Ultrasound", us1),
+  extract_info_maft_proportions("CT scan", tac1),
+  extract_info_maft_proportions("MRI", mri1),
+  extract_info_maft_proportions("PET", pet1),
+  extract_info_maft_proportions("Histology", hist1),
+  c(NA),
+  c("by Subgroups", rep(NA, 8)),
+  c("Sex", rep(NA, 8)),
+  extract_info_maft_proportions("Male", inc3, subgroup = T, sub_analysis = inc_sex_ft),
+  extract_info_maft_proportions("Female", inc5),
+  c("Age", rep(NA, 8)),
+  extract_info_maft_proportions(">45y", inc7, subgroup = T, sub_analysis = inc_age_ft),
+  extract_info_maft_proportions("<45y", inc9),
+  c("Tumor size", rep(NA, 8)),
+  extract_info_maft_proportions(">10mm", inc11, subgroup = T, sub_analysis = inc_tumorsize_ft),
+  extract_info_maft_proportions("<10mm", inc13),
+  c("USA-based", rep(NA, 8)),
+  extract_info_maft_proportions("USA", inc15, subgroup = T, sub_analysis = inc_uscountry_ft),
+  extract_info_maft_proportions("non-USA", inc17),
+  c("Population-based", rep(NA, 8)),
+  extract_info_maft_proportions("Population", inc19, subgroup = T, sub_analysis = inc_popbased_ft),
+  extract_info_maft_proportions("non-Population", inc21),
+  c(NA)
+)
+
+
+
+colnames(x) <- x[1,]
+x <- x[-1, ]
+x <- as_tibble(x)
+x$rate <- ifelse(is.na(x$n),
+                 NA,
+                 paste(x$n, "/", x$N))
+
+x[c(2:9)] <- sapply(x[c(2:9)],as.numeric)
+x$pr <- ifelse(is.na(x$est),
+               NA,
+               paste(formatC(x$est, format="f", digits =2), 
+                     "(", formatC(x$llci, format="f", digits =2),
+                     "-",
+                     formatC(x$ulci, format='f', digits=2),")"))
+
+x$i2 <- ifelse(x$studies == 1, 
+               paste("na"),
+               paste(round2(x$i2, n=0),"%"))
+
+x$p <- ifelse (is.na(x$p),
+               NA, 
+               ifelse(x$p<0.001, paste("<0.001"), formatC(x$p, format="f", digits =3)))
+
+
+prevalence <- cbind(
+  c("Population",  x$subgroup),
+  c("N of studies", x$studies),
+  c("Frequency (n/N)", x$rate),
+  c("I^2",  x$i2),
+  c("Prevalence (95% CI)", x$pr),
+  c("p value",  x$p),
+  c("Details", 
+    NA, "Supp Fig #1", NA, 
+    NA, "Supp Fig #2", "Supp Fig #3", "Supp Fig #4", "Supp Fig #5", "Supp Fig #6", "Supp Fig #7", NA,
+    NA, 
+    NA, "Supp Fig #8", "Supp Fig #9", 
+    NA, "Supp Fig #10", "Supp Fig #11", 
+    NA, "Supp Fig #12", "Supp Fig #13", 
+    NA, "Supp Fig #14", "Supp Fig #15", 
+    NA, "Supp Fig #16", "Supp Fig #17", 
+    NA))
+
+
+sub1 <- c(6, 11, 14,17, 20, 23, 26) 
+prevalence[,1][sub1] <- paste("  ",prevalence[,1][sub1]) 
+
+sub2 <- c(7:10, 15,16, 18,19, 21,22, 24,25, 27,28)
+prevalence[,1][sub2] <- paste("     ",prevalence[,1][sub2]) 
+
+rrsprev <- structure(list(
+  mean = c(NA, x$est),
+  lower = c(NA, x$llci),
+  upper = c(NA, x$ulci)),
+  .Names = c("mean", "lower", "upper"),
+  row.names = c(NA, -29L),
+  class = "data.frame")
+
+
+x <- x %>% add_row(.before = 1)
+
+x$box <- ifelse(x$N<=1000, 1, 
+                ifelse(x$N>1000 & x$N <= 2000, 2,
+                       ifelse(x$N>2000 & x$N <= 3000, 3,
+                              ifelse(x$N>3000 & x$N <= 4000, 4,
+                                     ifelse(x$N>4000 & x$N <= 5000, 5, NA)))))
+
+box <- x$box*0.2
+
+forestplot(prevalence,
+           graph.pos = 5,
+           zero = NA,
+           rrsprev,
+           new_page = TRUE,
+           colgap = unit(5, "mm"),
+           hrzl_lines = list("2" = gpar (lwd=1, columns=c(1:8), col="black")),
+           lineheight=unit(0.5,'cm'),
+           boxsize = box,
+           line.margin = 2,
+           is.summary = c(T,F,F,F,
+                          T, rep(F, 7),
+                          T, 
+                          rep(c(T,F,F), 5),
+                          F),
+           align = c("l","c", "c", "c"),
+           ci.vertices = TRUE,
+           txt_gp = fpTxtGp(label =gpar (cex=0.8), 
+                            ticks = gpar(cex = 0.8, fontface="bold"),
+                            summary = gpar(cex = 0.8),
+                            xlab = gpar(cex=0.8)),
+           xticks = c(0, 0.1, 0.2, 0.3, 0.4,0.5, 0.6, 0.7, 0.8, 0.9, 1),
+           xlog=FALSE,
+           clip = c(0,  0.4),
+           grid = gpar(lty=3, col="gray"),
+           lwd.xaxis = 1,
+           lwd.ci = 2.2,
+           graphwidth = unit(10,"cm"),
+           col=fpColors(box="black",line="grey", axes="grey20", summary="black"))
+
+
+
+
+# Supplementary figures for the overall figure ----------------------------
+
+
+# Suppl. Figure 1: (FT) Frequency of Incidental diagnosis in all patients with TC 
+tinc1 <- tables_proportion_ft(xi = inc1$pre$x, 
+                              ni = inc1$pre$n,
+                              analysis = inc1)
+
+plot_individual_proportion_ft(words = tinc1$b,
+                              numbers = tinc1$c,
+                              sizebox = 0.08,
+                              box_ma_results = inc1$ma,
+                              overall_box = 1)
+# Suppl. Figure 2: (FT) Frequency of Incidental imaging diagnosis in patients with TC 
+ti1 <- tables_proportion_ft(xi = i1$pre$x, 
+                            ni = i1$pre$n,
+                            analysis = i1)
+
+plot_individual_proportion_ft(words = ti1$b,
+                              numbers = ti1$c,
+                              sizebox = 0.05,
+                              box_ma_results = i1$ma,
+                              overall_box = 1)
+#Suppl. Figure 3: (FT) Frequency of Incidental Ultrasound diagnosis in patients with TC 
+tus1 <- tables_proportion_ft(xi = us1$pre$x, 
+                             ni = us1$pre$n,
+                             analysis = us1)
+
+plot_individual_proportion_ft(words = tus1$b,
+                              numbers = tus1$c,
+                              sizebox = 0.05,
+                              box_ma_results = us1$ma,
+                              overall_box = 1)
+# Suppl. Figure 4: (FT) Frequency of Incidental Computed Tomography Scan diagnosis in patients with TC
+ttac1 <- tables_proportion_ft(xi = tac1$pre$x, 
+                              ni = tac1$pre$totalparticipants,
+                              analysis = tac1)
+
+plot_individual_proportion_ft(words = ttac1$b,
+                              numbers = ttac1$c,
+                              sizebox = 0.025,
+                              box_ma_results = tac1$ma,
+                              overall_box = 1)
+# Suppl. Figure 5: (FT) Frequency of Incidental Magnetic Resonance Imaging diagnosis in patients with TC
+tmri1 <- tables_proportion_ft(xi = mri1$pre$x, 
+                              ni = mri1$pre$n,
+                              analysis = mri1)
+
+plot_individual_proportion_ft(words = tmri1$b,
+                              numbers = tmri1$c,
+                              sizebox = 0.025,
+                              box_ma_results = mri1$ma,
+                              overall_box = 1)
+# Suppl. Figure 6: (FT) Frequency of Incidental Positron Emission Tomography diagnosis in patients with TC 
+tpet1 <- tables_proportion_ft(xi = pet1$pre$x, 
+                              ni = pet1$pre$n,
+                              analysis = pet1)
+
+plot_individual_proportion_ft(words = tpet1$b,
+                              numbers = tpet1$c,
+                              sizebox = 0.025,
+                              box_ma_results = pet1$ma,
+                              overall_box = 1)
+# Suppl. Figure 7: (FT) Frequency of Incidental histology diagnosis in patients with TC
+thist1 <- tables_proportion_ft(xi = hist1$pre$x, 
+                               ni = hist1$pre$n,
+                               analysis = hist1)
+
+plot_individual_proportion_ft(words = thist1$b,
+                              numbers = thist1$c,
+                              sizebox = 0.05,
+                              box_ma_results = hist1$ma,
+                              overall_box = 1.5)
+# Suppl. Figure 8: (FT) Frequency of Incidental diagnosis in Male patients with TC 
+tinc3 <- tables_proportion_ft(xi = inc3$pre$x, 
+                              ni = inc3$pre$n,
+                              analysis = inc3)
+
+plot_individual_proportion_ft(words = tinc3$b,
+                              numbers = tinc3$c,
+                              sizebox = 0.04,
+                              box_ma_results = inc3$ma,
+                              overall_box = 1)
+# Suppl. Figure 9: (FT) Frequency of Incidental diagnosis in Female patients with TC
+tinc5 <- tables_proportion_ft(xi = inc5$pre$x, 
+                              ni = inc5$pre$n,
+                              analysis = inc5)
+
+plot_individual_proportion_ft(words = tinc5$b,
+                              numbers = tinc5$c,
+                              sizebox = 0.040,
+                              box_ma_results = inc5$ma,
+                              overall_box = 1)
+# Suppl. Figure 10: (FT) Frequency of Incidental diagnosis in patients aged 45 years and older with TC 
+tinc7 <- table_singleproportion_ft(xi = inc7$pre$x, 
+                                   ni = inc7$pre$n,
+                                   analysis = inc7)
+
+
+
+plot_single_proportion_ft(words = tinc7$b,
+                          numbers = tinc7$c,
+                          overall_box = 1)
+
+# Suppl. Figure 11: (FT) Frequency of Incidental diagnosis in patients aged 45 years and younger with TC 
+tinc9 <- table_singleproportion_ft(xi = inc9$pre$x, 
+                                   ni = inc9$pre$n,
+                                   analysis = inc9)
+
+plot_single_proportion_ft(words = tinc9$b,
+                          numbers = tinc9$c,
+                          overall_box = 1)
+
+# Suppl. Figure 12: (FT) Frequency of Incidental diagnosis in patients with TC and  tumor size >10mm 
+tinc11 <- tables_proportion_ft(xi = inc11$pre$x, 
+                               ni = inc11$pre$n,
+                               analysis = inc11,
+                               tumorsize = TRUE)
+
+plot_individual_proportion_ft(words = tinc11$b,
+                              numbers = tinc11$c,
+                              sizebox = 0.040,
+                              box_ma_results = inc11$ma,
+                              overall_box = 1)
+# Suppl. Figure 13: (FT) Frequency of Incidental diagnosis in patients with TC and tumor size <10mm 
+tinc13 <- tables_proportion_ft(xi = inc13$pre$x, 
+                               ni = inc13$pre$n,
+                               analysis = inc13,
+                               tumorsize = TRUE)
+
+plot_individual_proportion_ft(words = tinc13$b,
+                              numbers = tinc13$c,
+                              sizebox = 0.040,
+                              box_ma_results = inc13$ma,
+                              overall_box = 1.5)
+# Suppl. Figure 14: (FT) Frequency of Incidental diagnosis in patients with TC from the USA 
+tinc15 <- tables_proportion_ft(xi = inc15$pre$x, 
+                               ni = inc15$pre$n,
+                               analysis = inc15)
+
+plot_individual_proportion_ft(words = tinc15$b,
+                              numbers = tinc15$c,
+                              sizebox = 0.040,
+                              box_ma_results = inc15$ma,
+                              overall_box = 1)
+# Suppl. Figure 15: (FT) Frequency of Incidental diagnosis in patients with TC from a non-USA country 
+tinc17 <- tables_proportion_ft(xi = inc17$pre$x, 
+                               ni = inc17$pre$n,
+                               analysis = inc17)
+
+plot_individual_proportion_ft(words = tinc17$b,
+                              numbers = tinc17$c,
+                              sizebox = 0.040,
+                              box_ma_results = inc17$ma,
+                              overall_box = 1)
+# Suppl. Figure 16: (FT) Frequency of Incidental diagnosis in patients with TC from population based studies 
+tinc19 <- tables_proportion_ft(xi = inc19$pre$x, 
+                               ni = inc19$pre$n,
+                               analysis = inc19)
+
+plot_individual_proportion_ft(words = tinc19$b,
+                              numbers = tinc19$c,
+                              sizebox = 0.015,
+                              box_ma_results = inc19$ma,
+                              overall_box = 1.5)
+# Suppl. Figure 17: (FT) Frequency of Incidental diagnosis in patients with TC from non-population-based studies
+tinc21 <- tables_proportion_ft(xi = inc21$pre$x, 
+                               ni = inc21$pre$n,
+                               analysis = inc21)
+
+plot_individual_proportion_ft(words = tinc21$b,
+                              numbers = tinc21$c,
+                              sizebox = 0.040,
+                              box_ma_results = inc21$ma,
+                              overall_box = 1)
+
+
+# Overall figure for Imaging and Histology Incidental with FT method  ---------------------------
+x <- rbind(
+  c( "subgroup", "studies", "n", "N", "i2", "est", "llci", "ulci", "p"),
+  c(NA),
+  extract_info_maft_proportions("Imaging - Overall", i1),
+  c(NA),
+  c("Subgroups", rep(NA, 8)),
+  c("Sex", rep(NA, 8)),
+  extract_info_maft_proportions("Male", i3, subgroup = T, sub_analysis = i_sex_ft),
+  extract_info_maft_proportions("Female", i5),
+  c("Age", rep(NA, 8)),
+  extract_info_maft_proportions(">45y", i7, subgroup = T, sub_analysis = i_age_ft),
+  extract_info_maft_proportions("<45y", i9),
+  c("Tumor size", rep(NA, 8)),
+  extract_info_maft_proportions(">10mm", i11, subgroup = T, sub_analysis = i_tumorsize_ft),
+  extract_info_maft_proportions("<10mm", i13),
+  c("USA-based", rep(NA, 8)),
+  extract_info_maft_proportions("USA", i15, subgroup = T, sub_analysis = i_uscountry_ft),
+  extract_info_maft_proportions("non-USA", i17),
+  c("Population-based", rep(NA, 8)),
+  extract_info_maft_proportions("Population", i19, subgroup = T, sub_analysis = i_popbased_ft),
+  extract_info_maft_proportions("non-Population", i21),
+  c(NA),
+  
+  
+  c(NA),
+  extract_info_maft_proportions("Histology - Overall", hist1),
+  c(NA),
+  c("Subgroups", rep(NA, 8)),
+  c("Sex", rep(NA, 8)),
+  extract_info_maft_proportions("Male", hist3, subgroup = T, sub_analysis = hist_sex_ft),
+  extract_info_maft_proportions("Female", hist5),
+  c("Age", rep(NA, 8)),
+  extract_info_maft_proportions(">45y", hist7, subgroup = T, sub_analysis = hist_age_ft),
+  extract_info_maft_proportions("<45y", hist9),
+  c("Tumor size", rep(NA, 8)),
+  extract_info_maft_proportions(">10mm", hist11, subgroup = T, sub_analysis = hist_tumorsize_ft),
+  extract_info_maft_proportions("<10mm", hist13),
+  c("USA-based", rep(NA, 8)),
+  extract_info_maft_proportions("USA", hist15, subgroup = T, sub_analysis = hist_uscountry_ft),
+  extract_info_maft_proportions("non-USA", hist17),
+  c("Population-based", rep(NA, 8)),
+  extract_info_maft_proportions("Population", hist19, subgroup = T, 
+                                sub_analysis = hist_popbased_ft),
+  extract_info_maft_proportions("non-Population", hist21),
+  c(NA)
+)
+
+colnames(x) <- x[1,]
+x <- x[-1, ]
+x <- as_tibble(x)
+x$rate <- ifelse(is.na(x$n),
+                 NA,
+                 paste(x$n, "/", x$N))
+
+x[c(2:9)] <- sapply(x[c(2:9)],as.numeric)
+x$pr <- ifelse(is.na(x$est),
+               NA,
+               paste(formatC(x$est, format="f", digits =2), 
+                     "(", formatC(x$llci, format="f", digits =2),
+                     "-",
+                     formatC(x$ulci, format='f', digits=2),")"))
+
+x$i2 <- ifelse(x$studies == 1, 
+               paste("na"),
+               paste(round2(x$i2, n=0),"%"))
+
+x$p <- ifelse (is.na(x$p),
+               NA, 
+               ifelse(x$p<0.001, paste("<0.001"), formatC(x$p, format="f", digits =3)))
+
+
+prevalence <- cbind(
+  c("Population",  x$subgroup),
+  c("N of studies", x$studies),
+  c("Frequency (n/N)", x$rate),
+  c("I^2",  x$i2),
+  c("Prevalence (95% CI)", x$pr),
+  c("p value",  x$p),
+  c("Details", 
+    NA, "Supp Fig #2", NA, 
+    NA, NA, "Supp Fig #18", "Supp Fig #19", 
+    NA, "Supp Fig #20", "Supp Fig #21",
+    NA, "Supp Fig #22", "Supp Fig #23", 
+    NA, "Supp Fig #24", "Supp Fig #25", 
+    NA, "Supp Fig #26", "Supp Fig #27",
+    NA, NA, "Supp Fig #7", NA, 
+    NA, NA, "Supp Fig #28", "Supp Fig #29", 
+    NA, "Supp Fig #30", "Supp Fig #31", 
+    NA, "Supp Fig #32", "Supp Fig #33",
+    NA, "Supp Fig #34", "Supp Fig #35", 
+    NA, "Supp Fig #36", "Supp Fig #37",
+    NA))
+
+
+sub1 <- c(6, 9, 12, 15, 18, 26, 29, 32, 35, 38)
+prevalence[,1][sub1] <- paste("  ",prevalence[,1][sub1]) 
+
+sub2 <- c(7, 8, 10, 11, 13, 14, 16, 17, 19, 20,
+          27, 28, 30, 31, 33, 34, 36, 37, 39, 40)
+prevalence[,1][sub2] <- paste("     ",prevalence[,1][sub2]) 
+
+rrsprev <- structure(list(
+  mean = c(NA, x$est),
+  lower = c(NA, x$llci),
+  upper = c(NA, x$ulci)),
+  .Names = c("mean", "lower", "upper"),
+  row.names = c(NA, -41L),
+  class = "data.frame")
+
+
+x <- x %>% add_row(.before = 1)
+
+x$box <- ifelse(x$N<=1000, 1, 
+                ifelse(x$N>1000 & x$N <= 2000, 2,
+                       ifelse(x$N>2000 & x$N <= 3000, 3,
+                              ifelse(x$N>3000 & x$N <= 4000, 4,
+                                     ifelse(x$N>4000 & x$N <= 5000, 5, NA)))))
+
+box <- x$box*0.2
+
+forestplot(prevalence,
+           graph.pos = 5,
+           zero = NA,
+           rrsprev,
+           new_page = TRUE,
+           colgap = unit(5, "mm"),
+           hrzl_lines = list("2" = gpar (lwd=1, columns=c(1:8), col="black")),
+           lineheight=unit(0.5,'cm'),
+           boxsize = box,
+           line.margin = 2,
+           is.summary = c(T,F,F,F,
+                          T, 
+                          rep(c(T,F,F), 5),
+                          F, F, F, F,
+                          T, 
+                          rep(c(T,F,F), 5),
+                          F),
+           align = c("l","c", "c", "c"),
+           ci.vertices = TRUE,
+           txt_gp = fpTxtGp(label =gpar (cex=0.8), 
+                            ticks = gpar(cex = 0.8, fontface="bold"),
+                            summary = gpar(cex = 0.8),
+                            xlab = gpar(cex=0.8)),
+           xticks = c(0, 0.1, 0.2, 0.3, 0.4,0.5, 0.6, 0.7, 0.8, 0.9, 1),
+           xlog=FALSE,
+           clip = c(0,  0.4),
+           grid = gpar(lty=3, col="gray"),
+           lwd.xaxis = 1,
+           lwd.ci = 2.2,
+           graphwidth = unit(10,"cm"),
+           col=fpColors(box="black",line="grey", axes="grey20", summary="black"))
+
+```
+
+# Supplementary figures for overall imaging and histology ------------------
+# Suppl. Figure 2: (FT) Frequency of Incidental Imaging diagnosis in patients with TC
+
+ti1 <- tables_proportion_ft(xi = i1$pre$x, 
+                            ni = i1$pre$n,
+                            analysis = i1)
+
+plot_individual_proportion_ft(words = ti1$b,
+                              numbers = ti1$c,
+                              sizebox = 0.05,
+                              box_ma_results = i1$ma,
+                              overall_box = 1)
+# Suppl. Figure 18: (FT) Frequency of Incidental Imaging diagnosis in Male patients with TC 
+ti3 <- tables_proportion_ft(xi = i3$pre$x, 
+                            ni = i3$pre$n,
+                            analysis = i3)
+
+plot_individual_proportion_ft(words = ti3$b,
+                              numbers = ti3$c,
+                              sizebox = 0.012,
+                              box_ma_results = i3$ma,
+                              overall_box = 1.5)
+# Suppl. Figure 19: (FT) Frequency of Incidental Imaging diagnosis in Female patients with TC 
+ti5 <- tables_proportion_ft(xi = i5$pre$x, 
+                            ni = i5$pre$n,
+                            analysis = i5)
+
+plot_individual_proportion_ft(words = ti5$b,
+                              numbers = ti5$c,
+                              sizebox = 0.012,
+                              box_ma_results = i5$ma,
+# Suppl. Figure 20: (FT) Frequency of Incidental Imaging diagnosis in patients aged 45 years and older with TC
+ti7 <- table_singleproportion_ft(xi = i7$pre$x, 
+                                 ni = i7$pre$n,
+                                 analysis = i7)
+
+plot_single_proportion_ft(words = ti7$b,
+                          numbers = ti7$c,
+                          overall_box = 1)
+
+# Suppl. Figure 21: (FT) Frequency of Incidental Imaging diagnosis in patients aged 45 years and younger with TC 
+ti9 <- table_singleproportion_ft(xi = i9$pre$x, 
+                                 ni = i9$pre$n,
+                                 analysis = i9)
+
+plot_single_proportion_ft(words = ti9$b,
+                          numbers = ti9$c,
+                          overall_box = 1)
+
+
+# Suppl. Figure 22: (FT) Frequency of Incidental Imaging diagnosis in patients with TC and  tumor size >10mm 
+ti11 <- tables_proportion_ft(xi = i11$pre$x, 
+                             ni = i11$pre$n,
+                             analysis = i11,
+                             tumorsize = TRUE)
+
+plot_individual_proportion_ft(words = ti11$b,
+                              numbers = ti11$c,
+                              sizebox = 0.040,
+                              box_ma_results = i11$ma,
+                              overall_box = 1)
+# Suppl. Figure 23: (FT) Frequency of Incidental Imaging diagnosis in patients with TC and tumor size <10mm 
+ti13 <- tables_proportion_ft(xi = i13$pre$x, 
+                             ni = i13$pre$n,
+                             analysis = i13,
+                             tumorsize = TRUE)
+
+plot_individual_proportion_ft(words = ti13$b,
+                              numbers = ti13$c,
+                              sizebox = 0.025,
+                              box_ma_results = i13$ma,
+                              overall_box = 1)
+# Suppl. Figure 24: (FT) Frequency of Incidental Imaging diagnosis in patients with TC from the USA 
+ti15 <- tables_proportion_ft(xi = i15$pre$x, 
+                             ni = i15$pre$n,
+                             analysis = i15)
+
+plot_individual_proportion_ft(words = ti15$b,
+                              numbers = ti15$c,
+                              sizebox = 0.030,
+                              box_ma_results = i15$ma,
+                              overall_box = 1)
+# Suppl. Figure 25: (FT) Frequency of Incidental Imaging diagnosis in patients with TC from a non-USA country 
+ti17 <- tables_proportion_ft(xi = i17$pre$x, 
+                             ni = i17$pre$n,
+                             analysis = i17)
+
+plot_individual_proportion_ft(words = ti17$b,
+                              numbers = ti17$c,
+                              sizebox = 0.040,
+                              box_ma_results = i17$ma,
+                              overall_box = 1)
+
+# Suppl. Figure 26: (FT) Frequency of Incidental Imaging diagnosis in patients with TC from population based studies 
+ti19 <- tables_proportion_ft(xi = i19$pre$x, 
+                             ni = i19$pre$n,
+                             analysis = i19)
+
+plot_individual_proportion_ft(words = ti19$b,
+                              numbers = ti19$c,
+                              sizebox = 0.015,
+                              box_ma_results = i19$ma,
+                              overall_box = 1.5)
+# Suppl. Figure 27: (FT) Frequency of Incidental Imaging diagnosis in patients with TC from non-population-based studies 
+ti21 <- tables_proportion_ft(xi = i21$pre$x, 
+                             ni = i21$pre$n,
+                             analysis = i21)
+
+plot_individual_proportion_ft(words = ti21$b,
+                              numbers = ti21$c,
+                              sizebox = 0.040,
+                              box_ma_results = i21$ma,
+                              overall_box = 1.5)
+# Suppl. Figure 7: (FT) Frequency of Incidental Histology diagnosis in patients with TC 
+thist1 <- tables_proportion_ft(xi = hist1$pre$x, 
+                               ni = hist1$pre$n,
+                               analysis = hist1)
+
+plot_individual_proportion_ft(words = thist1$b,
+                              numbers = thist1$c,
+                              sizebox = 0.05,
+                              box_ma_results = hist1$ma,
+                              overall_box = 1.5)
+# Suppl. Figure 28: (FT) Frequency of Incidental Histology diagnosis in Male patients with TC 
+thist3 <- tables_proportion_ft(xi = hist3$pre$x, 
+                               ni = hist3$pre$n,
+                               analysis = hist3)
+
+plot_individual_proportion_ft(words = thist3$b,
+                              numbers = thist3$c,
+                              sizebox = 0.025,
+                              box_ma_results = hist3$ma,
+                              overall_box = 1.5)
+# Suppl. Figure 29: (FT) Frequency of Incidental Histology diagnosis in Female patients with TC 
+thist5 <- tables_proportion_ft(xi = hist5$pre$x, 
+                               ni = hist5$pre$n,
+                               analysis = hist5)
+
+plot_individual_proportion_ft(words = thist5$b,
+                              numbers = thist5$c,
+                              sizebox = 0.025,
+                              box_ma_results = hist5$ma,
+                              overall_box = 1.5)
+# Suppl. Figure 30: (FT) Frequency of Incidental Histology diagnosis in patients aged 45 years and older with TC 
+thist7 <- table_singleproportion_ft(xi = hist7$pre$x, 
+                                    ni = hist7$pre$n,
+                                    analysis = hist7)
+
+plot_single_proportion_ft(words = thist7$b,
+                          numbers = thist7$c,
+                          overall_box = 1)
+# Suppl. Figure 31: (FT) Frequency of Incidental Histology diagnosis in patients aged 45 years and younger with TC 
+thist9 <- table_singleproportion_ft(xi = hist9$pre$x, 
+                                    ni = hist9$pre$n,
+                                    analysis = hist9)
+
+plot_single_proportion_ft(words = thist9$b,
+                          numbers = thist9$c,
+                          overall_box = 1)
+
+# Suppl. Figure 32: (FT) Frequency of Incidental Histology diagnosis in patients with TC and  tumor size >10mm 
+thist11 <- tables_proportion_ft(xi = hist11$pre$x, 
+                                ni = hist11$pre$n,
+                                analysis = hist11,
+                                tumorsize = TRUE)
+
+plot_individual_proportion_ft(words = thist11$b,
+                              numbers = thist11$c,
+                              sizebox = 0.025,
+                              box_ma_results = hist11$ma,
+                              overall_box = 1.5)
+
+# Suppl. Figure 33: (FT) Frequency of Incidental Histology diagnosis in patients with TC and tumor size <10mm 
+thist13 <- tables_proportion_ft(xi = hist13$pre$x, 
+                                ni = hist13$pre$n,
+                                analysis = hist13,
+                                tumorsize = TRUE)
+
+plot_individual_proportion_ft(words = thist13$b,
+                              numbers = thist13$c,
+                              sizebox = 0.025,
+                              box_ma_results = hist13$ma,
+                              overall_box = 1.5)
+# Suppl. Figure 34: (FT) Frequency of Incidental Histology diagnosis in patients with TC from the USA 
+thist15 <- tables_proportion_ft(xi = hist15$pre$x, 
+                                ni = hist15$pre$n,
+                                analysis = hist15)
+
+plot_individual_proportion_ft(words = thist15$b,
+                              numbers = thist15$c,
+                              sizebox = 0.025,
+                              box_ma_results = hist15$ma,
+                              overall_box = 1)
+# Suppl. Figure 35: (FT) Frequency of Incidental Histology diagnosis in patients with TC from a non-USA country 
+thist17 <- tables_proportion_ft(xi = hist17$pre$x, 
+                                ni = hist17$pre$n,
+                                analysis = hist17)
+
+plot_individual_proportion_ft(words = thist17$b,
+                              numbers = thist17$c,
+                              sizebox = 0.040,
+                              box_ma_results = hist17$ma,
+                              overall_box = 1)
+
+# Suppl. Figure 36: (FT) Frequency of Incidental Histology diagnosis in patients with TC from population based studies
+thist19 <- tables_proportion_ft(xi = hist19$pre$x, 
+                                ni = hist19$pre$n,
+                                analysis = hist19)
+
+plot_individual_proportion_ft(words = thist19$b,
+                              numbers = thist19$c,
+                              sizebox = 0.0125,
+                              box_ma_results = hist19$ma,
+                              overall_box = 1)
+# Suppl. Figure 37: (FT) Frequency of Incidental Histology diagnosis in patients with TC from non-population-based studies 
+thist21 <- tables_proportion_ft(xi = hist21$pre$x, 
+                                ni = hist21$pre$n,
+                                analysis = hist21)
+
+plot_individual_proportion_ft(words = thist21$b,
+                              numbers = thist21$c,
+                              sizebox = 0.040,
+                              box_ma_results = hist21$ma,
+                              overall_box = 1)
+
+
+# Supplementary figures with GLMM -----------------------------------------
+
+# Suppl. Figure 38: (GLMM) Frequency of Incidental diagnosis in patients with TC 
+tinc2 <- tables_proportion_glmm(xi = inc2$pre$x, 
+                                ni = inc2$pre$n,
+                                analysis = inc2)
+
+plot_individual_proportion_glmm(words = tinc2$b,
+                                numbers = tinc2$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 39: (GLMM) Frequency of Incidental diagnosis in Male patients with TC 
+tinc4 <- tables_proportion_glmm(xi = inc4$pre$x, 
+                                ni = inc4$pre$n,
+                                analysis = inc4)
+
+plot_individual_proportion_glmm(words = tinc4$b,
+                                numbers = tinc4$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 40: (GLMM) Frequency of Incidental diagnosis in Female patients with TC 
+tinc6 <- tables_proportion_glmm(xi = inc6$pre$x, 
+                                ni = inc6$pre$n,
+                                analysis = inc6)
+
+plot_individual_proportion_glmm(words = tinc6$b,
+                                numbers = tinc6$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 41: (GLMM) Frequency of Incidental diagnosis in patients with TC and  tumor size >10mm 
+tinc12 <- tables_proportion_glmm(xi = inc12$pre$x, 
+                                 ni = inc12$pre$n,
+                                 analysis = inc12,
+                                 tumorsize = TRUE)
+
+plot_individual_proportion_glmm(words = tinc12$b,
+                                numbers = tinc12$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 42: (GLMM) Frequency of Incidental diagnosis in patients with TC and tumor size <10mm 
+tinc14 <- tables_proportion_glmm(xi = inc14$pre$x, 
+                                 ni = inc14$pre$n,
+                                 analysis = inc14,
+                                 tumorsize = TRUE)
+
+plot_individual_proportion_glmm(words = tinc14$b,
+                                numbers = tinc14$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 43: (GLMM) Frequency of Incidental diagnosis in patients with TC from the USA 
+tinc16 <- tables_proportion_glmm(xi = inc16$pre$x, 
+                                 ni = inc16$pre$n,
+                                 analysis = inc16)
+
+plot_individual_proportion_glmm(words = tinc16$b,
+                                numbers = tinc16$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 44: (GLMM) Frequency of Incidental diagnosis in patients with TC from a non-USA country 
+tinc18 <- tables_proportion_glmm(xi = inc18$pre$x, 
+                                 ni = inc18$pre$n,
+                                 analysis = inc18)
+
+plot_individual_proportion_glmm(words = tinc18$b,
+                                numbers = tinc18$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 45: (GLMM) Frequency of Incidental diagnosis in patients with TC from population based studies 
+tinc20 <- tables_proportion_glmm(xi = inc20$pre$x, 
+                                 ni = inc20$pre$n,
+                                 analysis = inc20)
+
+plot_individual_proportion_glmm(words = tinc20$b,
+                                numbers = tinc20$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 46: (GLMM) Frequency of Incidental diagnosis in patients with TC from non-population-based studies 
+tinc22 <- tables_proportion_glmm(xi = inc22$pre$x, 
+                                 ni = inc22$pre$n,
+                                 analysis = inc22)
+
+plot_individual_proportion_glmm(words = tinc22$b,
+                                numbers = tinc22$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 47: (GLMM) Frequency of Incidental diagnosis in patients with TC 
+ti2 <- tables_proportion_glmm(xi = i2$pre$x, 
+                              ni = i2$pre$n,
+                              analysis = i2)
+
+plot_individual_proportion_glmm(words = ti2$b,
+                                numbers = ti2$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 48: (GLMM) Frequency of Incidental imaging diagnosis in Male patients with TC 
+ti4 <- tables_proportion_glmm(xi = i4$pre$x, 
+                              ni = i4$pre$n,
+                              analysis = i4)
+
+plot_individual_proportion_glmm(words = ti4$b,
+                                numbers = ti4$c,
+                                ind_box = 0.5,
+                                overall_box = 1.5)
+# Suppl. Figure 49: (GLMM) Frequency of Incidental imaging diagnosis in Female patients with TC 
+ti6 <- tables_proportion_glmm(xi = i6$pre$x, 
+                              ni = i6$pre$n,
+                              analysis = i6)
+
+plot_individual_proportion_glmm(words = ti6$b,
+                                numbers = ti6$c,
+                                ind_box = 0.5,
+                                overall_box = 1.5)
+# Suppl. Figure 50: (GLMM) Frequency of Incidental imaging diagnosis in patients with TC and  tumor size >10mm 
+ti12 <- tables_proportion_glmm(xi = i12$pre$x, 
+                               ni = i12$pre$n,
+                               analysis = i12,
+                               tumorsize = TRUE)
+
+plot_individual_proportion_glmm(words = ti12$b,
+                                numbers = ti12$c,
+                                ind_box = 0.5,
+                                overall_box = 1.5)
+# Suppl. Figure 51: (GLMM) Frequency of Incidental imaging diagnosis in patients with TC and tumor size <10mm 
+ti14 <- tables_proportion_glmm(xi = i14$pre$x, 
+                               ni = i14$pre$n,
+                               analysis = i14,
+                               tumorsize = TRUE)
+
+plot_individual_proportion_glmm(words = ti14$b,
+                                numbers = ti14$c,
+                                ind_box = 0.5,
+                                overall_box = 1.5)
+# Suppl. Figure 52: (GLMM) Frequency of Incidental imaging diagnosis in patients with TC from the USA 
+ti16 <- tables_proportion_glmm(xi = i16$pre$x, 
+                               ni = i16$pre$n,
+                               analysis = i16)
+
+plot_individual_proportion_glmm(words = ti16$b,
+                                numbers = ti16$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 53: (GLMM) Frequency of Incidental imaging diagnosis in patients with TC from a non-USA country 
+ti18 <- tables_proportion_glmm(xi = i18$pre$x, 
+                               ni = i18$pre$n,
+                               analysis = i18)
+
+plot_individual_proportion_glmm(words = ti18$b,
+                                numbers = ti18$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 54: (GLMM) Frequency of Incidental imaging diagnosis in patients with TC from population based studies 
+ti20 <- tables_proportion_glmm(xi = i20$pre$x, 
+                               ni = i20$pre$n,
+                               analysis = i20)
+
+plot_individual_proportion_glmm(words = ti20$b,
+                                numbers = ti20$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 55: (GLMM) Frequency of Incidental imaging diagnosis in patients with TC from non-population-based studies 
+ti22 <- tables_proportion_glmm(xi = i22$pre$x, 
+                               ni = i22$pre$n,
+                               analysis = i22)
+
+plot_individual_proportion_glmm(words = ti22$b,
+                                numbers = ti22$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 56: (GLMM) Frequency of Incidental Ultrasound diagnosis in patients with TC 
+tus2 <- tables_proportion_glmm(xi = us2$pre$x, 
+                               ni = us2$pre$n,
+                               analysis = us2)
+
+plot_individual_proportion_glmm(words = tus2$b,
+                                numbers = tus2$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 57: (GLMM) Frequency of Incidental Computed Tomography Scan diagnosis in patients with TC 
+ttac2 <- tables_proportion_glmm(xi = tac2$pre$x, 
+                                ni = tac2$pre$totalparticipants,
+                                analysis = tac2)
+
+plot_individual_proportion_glmm(words = ttac2$b,
+                                numbers = ttac2$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 58: (GLMM) Frequency of Incidental Positron Emission Tomography diagnosis in patients with TC 
+tpet2 <- tables_proportion_glmm(xi = pet2$pre$x, 
+                                ni = pet2$pre$n,
+                                analysis = pet2)
+
+plot_individual_proportion_glmm(words = tpet2$b,
+                                numbers = tpet2$c,
+                                ind_box = 0.5,
+                                overall_box = 1.5)
+# Suppl. Figure 59: (GLMM) Frequency of Incidental Magnetic Resonance Imaging diagnosis in patients with TC 
+tmri2 <- tables_proportion_glmm(xi = mri2$pre$x, 
+                                ni = mri2$pre$n,
+                                analysis = mri2)
+
+plot_individual_proportion_glmm(words = tmri2$b,
+                                numbers = tmri2$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 60: (GLMM) Frequency of Incidental histology diagnosis in patients with TC 
+thist2 <- tables_proportion_glmm(xi = hist2$pre$x, 
+                                 ni = hist2$pre$n,
+                                 analysis = hist2)
+
+plot_individual_proportion_glmm(words = thist2$b,
+                                numbers = thist2$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 61: (GLMM) Frequency of Incidental histology diagnosis in Male patients with TC
+thist4 <- tables_proportion_glmm(xi = hist4$pre$x, 
+                                 ni = hist4$pre$n,
+                                 analysis = hist4)
+
+plot_individual_proportion_glmm(words = thist4$b,
+                                numbers = thist4$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 62: (GLMM) Frequency of Incidental Histology diagnosis in Female patients with TC
+thist6 <- tables_proportion_glmm(xi = hist6$pre$x, 
+                                 ni = hist6$pre$n,
+                                 analysis = hist6)
+
+plot_individual_proportion_glmm(words = thist6$b,
+                                numbers = thist6$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 63: (GLMM) Frequency of Incidental Histology diagnosis in patients with TC and  tumor size >10mm 
+thist12 <- tables_proportion_glmm(xi = hist12$pre$x, 
+                                  ni = hist12$pre$n,
+                                  analysis = hist12,
+                                  tumorsize = TRUE)
+
+plot_individual_proportion_glmm(words = thist12$b,
+                                numbers = thist12$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+
+# Suppl. Figure 64: (GLMM) Frequency of Incidental Histology diagnosis in patients with TC and tumor size <10mm 
+thist14 <- tables_proportion_glmm(xi = hist14$pre$x, 
+                                  ni = hist14$pre$n,
+                                  analysis = hist14,
+                                  tumorsize = TRUE)
+
+plot_individual_proportion_glmm(words = thist14$b,
+                                numbers = thist14$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 65: (GLMM) Frequency of Incidental Histology diagnosis in patients with TC from the USA 
+thist16 <- tables_proportion_glmm(xi = hist16$pre$x, 
+                                  ni = hist16$pre$n,
+                                  analysis = hist16)
+
+plot_individual_proportion_glmm(words = thist16$b,
+                                numbers = thist16$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 66: (GLMM) Frequency of Incidental Histology diagnosis in patients with TC from a non-USA country 
+thist18 <- tables_proportion_glmm(xi = hist18$pre$x, 
+                                  ni = hist18$pre$n,
+                                  analysis = hist18)
+
+plot_individual_proportion_glmm(words = thist18$b,
+                                numbers = thist18$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 67: (GLMM) Frequency of Incidental Histology diagnosis in patients with TC from population based studies 
+thist20 <- tables_proportion_glmm(xi = hist20$pre$x, 
+                                  ni = hist20$pre$n,
+                                  analysis = hist20)
+
+plot_individual_proportion_glmm(words = thist20$b,
+                                numbers = thist20$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+# Suppl. Figure 68: (GLMM) Frequency of Incidental Histology diagnosis in patients with TC from non-population-based studies 
+thist22 <- tables_proportion_glmm(xi = hist22$pre$x, 
+                                  ni = hist22$pre$n,
+                                  analysis = hist22)
+
+plot_individual_proportion_glmm(words = thist22$b,
+                                numbers = thist22$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
+
+# Suppl. Figure 69 (FT) Frequency of NON-Incidental diagnosis in patients with TC 
+tnoninc1 <- tables_proportion_ft(xi = noninc1$pre$x, 
+                                 ni = noninc1$pre$n,
+                                 analysis = noninc1)
+
+plot_individual_proportion_ft(words = tnoninc1$b,
+                              numbers = tnoninc1$c,
+                              sizebox = 0.08,
+                              box_ma_results = noninc1$ma,
+                              overall_box = 1)
+# Suppl. Figure 70 (GLMM) Frequency of NON-Incidental diagnosis in patients with TC
+tnoninc2 <- tables_proportion_glmm(xi = noninc2$pre$x, 
+                                   ni = noninc2$pre$n,
+                                   analysis = noninc2)
+
+plot_individual_proportion_glmm(words = tnoninc2$b,
+                                numbers = tnoninc2$c,
+                                ind_box = 0.5,
+                                overall_box = 1)
