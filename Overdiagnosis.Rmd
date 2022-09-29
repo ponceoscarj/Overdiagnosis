@@ -1,23 +1,31 @@
 ---
 title: "Overdiagnosis"
-author: "Oscar J. Ponce & Eddy Lincango-Naranjo"
 date: "5/18/2020"
 output: github_document
+knit: (function(inputFile, encoding) { rmarkdown::render(inputFile, encoding = encoding, output_file = paste0(dirname(inputFile),'/README.md')) })
+
 ---
+
+<i>Analysis and visualization developed by [Oscar J. Ponce](https://twitter.com/PonceOJ), and the project was led by [Eddy P Lincango-Naranjo](https://twitter.com/DoctorEddyMD)</i>
+
+## Publication
+
+*Article was published in 2021. To know more about the methodology, results and conclusion of this study follow the link below.*
+
+| Title      | [Triggers of thyroid cancer diagnosis: a systematic review and meta-analysis](https://link.springer.com/article/10.1007/s12020-020-02588-8) |
+| :--- | :---- |
+| Journal      | Endocrine       |
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo=TRUE)
 knitr::opts_chunk$set(dpi=900)
 knitr::opts_chunk$set(fig.path = "Output Figures/", dev='svg')
 
-library("metafor")
-library("tidyverse")
-library("rmarkdown")
-library("magrittr")
-library("forestplot")
-library(DescTools)
-library(lattice)
-library(gt)
+library(metafor)
+library(tidyverse)
+library(rmarkdown)
+library(forestplot)
+
 ```
 
 ## Open Data
@@ -28,7 +36,7 @@ library(gt)
 | Stage  |      File     |  
 |:----------:|:-------------:|
 | Protocol | [Available as PDF](https://github.com/ponceoscarj/Overdiagnosis/blob/master/1%20Protocol/Protocol.pdf)|
-| Search strategy | `Shown below` (Available to download as `.CSV`: [OVID](https://github.com/ponceoscarj/Overdiagnosis/blob/master/2%20Search%20strategy/ovid_search.csv), [Scopus](https://github.com/ponceoscarj/Overdiagnosis/blob/master/2%20Search%20strategy/scopus_search.csv))  |
+| Search strategy | Available to download as `.CSV`: [OVID](https://github.com/ponceoscarj/Overdiagnosis/blob/master/2%20Search%20strategy/ovid_search.csv), [Scopus](https://github.com/ponceoscarj/Overdiagnosis/blob/master/2%20Search%20strategy/scopus_search.csv)  |
 | Abstract screening | [References included for abstract screening](https://github.com/ponceoscarj/Overdiagnosis/blob/master/3%20References/Articles%20included%20for%20Abstract%20screening.ris) |
 | Full-text screening | [References included for full-text ](https://github.com/ponceoscarj/Overdiagnosis/blob/master/3%20References/Articles%20included%20for%20Full%20text%20screening.ris) |
 | Included studies | [References included in the Meta-Analysis](https://github.com/ponceoscarj/Overdiagnosis/blob/master/3%20References/Articles%20included%20in%20meta-analysis.ris) |
@@ -36,123 +44,9 @@ library(gt)
 | Analysis codes | [Script available as `R Markdown`](https://github.com/ponceoscarj/Overdiagnosis/blob/master/Overdiagnosis.Rmd) |
 
 
-## Search strategy
-
-
-<details>
-<summary>Show OVID search</summary>
-
-```{r ovid, echo=FALSE, message=FALSE, warning=FALSE}
-
-ovid <- read.csv("2 Search strategy/ovid_search.csv")
-names(ovid)[1] <- "line"
-names(ovid)[2] <- "terms"
-
-ovid <- as_tibble(ovid)
-
-ovid <- 
-  ovid %>%
-  gt(
-    rowname_col = "row",
-    groupname_col = "group"
-  )   %>%
-  fmt_markdown(columns = TRUE)
-
-
-ovid2 <- 
-  ovid %>%
-  tab_header( 
-    title = md("**Ovid Search**"),
-    subtitle = md("Embase 1974 to 2020 June 02, Ovid MEDLINE(R) and Epub Ahead of Print, In-Process & Other Non-Indexed Citations and Daily 1946 to June 02, 2020 
-Search Strategy")
-    ) %>%
-  tab_options( 
-    data_row.padding = px(5)
-  ) %>%
-  cols_align(
-    align = "left",
-    columns = TRUE
-  ) %>%
-  fmt_number( 
-    columns = vars("line"),
-    decimals = 0
-  ) %>%
-  fmt_passthrough(
-    columns = vars("terms"),
-  ) %>%
-
-  cols_label(
-    line = md("**Search <br> line**"),
-    terms = md("**Search <br> terms**")
-  ) 
-  
-
-gtsave(ovid2, "ovid.png")
-invisible(file.remove("ovid.png"))
-
-
-```
-
-</details>
-
-
-<details>
-<summary>Show SCOPUS search</summary>
-
-```{r scopus, echo=FALSE, message=FALSE, warning=FALSE}
-
-scopus <- read.csv("2 Search strategy/scopus_search.csv")
-names(scopus)[1] <- "line"
-names(scopus)[2] <- "terms"
-
-ovid <- as_tibble(scopus)
-
-scopus <- scopus %>% 
-gt() %>%
-  tab_header( 
-    title = md("**Scopus Search**"),
-  ) %>%
-  cols_align(
-    align = "left",
-    columns = TRUE
-  ) %>%
-  fmt_number( 
-    columns = vars("line"),
-    decimals = 0
-  ) %>%
-  fmt_passthrough(
-    columns = vars("terms"),
-  ) %>%
-  cols_label(
-    line = md("**Search <br> line**"),
-    terms = md("**Search <br> terms**"),
-  ) %>%
-  tab_options(
-        column_labels.border.bottom.width = 0.5,
-        data_row.padding = px(4)
-  )%>%
-  tab_options(
-        column_labels.border.bottom.width = 0.5,
-        column_labels.border.top.width = 0.5,
-        table.font.size = "small",
-
-        data_row.padding = px(5)
-  )
-
-gtsave(scopus, "scopus.png")
-invisible(file.remove("scopus.png"))
-
-```
-</details>
-
-
-
-
-```{r uploading_database, echo=FALSE, warning=FALSE, message=FALSE}
-od <- read.csv("4 Data/overdiagnosis_excel.csv")
-```
 
 ```{r cleaning, echo=FALSE, warning=FALSE, message=FALSE}
+od <- read.csv("4 Data/overdiagnosis_excel.csv")
 
 names(od)[2] <- "study"
 names(od)[11] <- "tumorsize"
@@ -166,8 +60,6 @@ names(od)[32] <- "mri"
 names(od)[34] <- "histology"
 names(od)[44] <- "uscountry"
 names(od)[45] <- "popbased"
-
-
 ```
 
 ```{r functions_for_analysis_figures, echo=FALSE, warning=FALSE, message=FALSE, fig.show='hide'}
@@ -452,23 +344,23 @@ forestplot(words,
 extract_info_maft_proportions <- function(group, maresults, subgroup = NA, sub_analysis){
   ifelse(is.na(subgroup),
   a <- c(paste(group),
-    maresults$ma[[15]],
+    maresults$ma[["k"]],
     sum(maresults$pre$x),
     sum(maresults$pre$n),
-    maresults$ma[[25]],
-    maresults$exp[[1]], 
-    maresults$exp[[3]], 
-    maresults$exp[[4]],
+    maresults$ma[["I2"]],
+    maresults$exp[["pred"]], 
+    maresults$exp[["ci.lb"]], 
+    maresults$exp[["ci.ub"]],
     NA),
   a <- c(paste(group),
-    maresults$ma[[15]],
+    maresults$ma[["k"]],
     sum(maresults$pre$x),
     sum(maresults$pre$n),
-    maresults$ma[[25]],
-    maresults$exp[[1]], 
-    maresults$exp[[3]], 
-    maresults$exp[[4]],
-    sub_analysis[[24]]))
+    maresults$ma[["I2"]],
+    maresults$exp[["pred"]], 
+    maresults$exp[["ci.lb"]], 
+    maresults$exp[["ci.ub"]],
+    sub_analysis[["QMp"]]))
   
   return(a)
 }
@@ -477,23 +369,23 @@ extract_info_maft_proportions <- function(group, maresults, subgroup = NA, sub_a
 extract_info_maglmm_proportions <- function(group, maresults, subgroup = NA, sub_analysis){
   ifelse(is.na(subgroup),
   a <- c(paste(group),
-    maresults$ma[[15]],
+    maresults$ma[["k"]],
     sum(maresults$pre$x),
     sum(maresults$pre$n),
-    maresults$ma[[28]],
-    maresults$exp[[1]], 
-    maresults$exp[[3]], 
-    maresults$exp[[4]],
+    maresults$ma[["I2"]],
+    maresults$exp[["pred"]], 
+    maresults$exp[["ci.lb"]], 
+    maresults$exp[["ci.ub"]],
     NA),
   a <- c(paste(group),
-    maresults$ma[[15]],
+    maresults$ma[["k"]],
     sum(maresults$pre$x),
     sum(maresults$pre$n),
-    maresults$ma[[28]],
-    maresults$exp[[1]], 
-    maresults$exp[[3]], 
-    maresults$exp[[4]],
-    sub_analysis[[24]]))
+    maresults$ma[["I2"]],
+    maresults$exp[["pred"]], 
+    maresults$exp[["ci.lb"]], 
+    maresults$exp[["ci.ub"]],
+    sub_analysis[["QMp"]]))
   
   return(a)
 }
@@ -948,20 +840,20 @@ forestplot(prevalence,
 ```
 
 
-> **Show supplementary figures used to generate Figure 3**
+### Supplementary figures used to generate Figure 3
 
 <p>
 </p>
 
-<details><summary>Click to show</summary>
 
-  + <details><summary> Suppl. Figure 1: (FT) Frequency of Incidental diagnosis in all patients with TC </summary>
-  <p>
+<details><summary> Suppl. Figure 1: (FT) Frequency of Incidental diagnosis in all patients with TC </summary>
+
 ```{r ft_incidental_overall, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE} 
 
 tinc1 <- tables_proportion_ft(xi = inc1$pre$x, 
                               ni = inc1$pre$n,
                               analysis = inc1)
+tinc1$b <- as.matrix(tinc1$b)
 
 plot_individual_proportion_ft(words = tinc1$b,
                               numbers = tinc1$c,
@@ -969,143 +861,144 @@ plot_individual_proportion_ft(words = tinc1$b,
                               box_ma_results = inc1$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
-  + <details><summary> Suppl. Figure 2: (FT) Frequency of Incidental imaging diagnosis in patients with TC </summary>
-  <p>
+
+</details>
+  
+<details><summary> Suppl. Figure 2: (FT) Frequency of Incidental imaging diagnosis in         patients with TC </summary>
+
 ```{r ft_imaging_overall, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE} 
 
 ti1 <- tables_proportion_ft(xi = i1$pre$x, 
                               ni = i1$pre$n,
                               analysis = i1)
 
-plot_individual_proportion_ft(words = ti1$b,
+plot_individual_proportion_ft(words = as.matrix(ti1$b),
                               numbers = ti1$c,
                               sizebox = 0.05,
                               box_ma_results = i1$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
-  + <details><summary> Suppl. Figure 3: (FT) Frequency of Incidental Ultrasound diagnosis in patients with TC </summary>
-  <p>
+
+</details>
+  
+<details><summary> Suppl. Figure 3: (FT) Frequency of Incidental Ultrasound diagnosis in patients with TC </summary>
+
 ```{r ft_ultrasound_overall, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE} 
 
 tus1 <- tables_proportion_ft(xi = us1$pre$x, 
                               ni = us1$pre$n,
                               analysis = us1)
 
-plot_individual_proportion_ft(words = tus1$b,
+plot_individual_proportion_ft(words = as.matrix(tus1$b),
                               numbers = tus1$c,
                               sizebox = 0.05,
                               box_ma_results = us1$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
-  + <details><summary> Suppl. Figure 4: (FT) Frequency of Incidental Computed Tomography Scan diagnosis in patients with TC </summary>
-  <p>
+
+</details>
+  
+<details><summary> Suppl. Figure 4: (FT) Frequency of Incidental Computed Tomography Scan diagnosis in patients with TC </summary>
+
 ```{r ft_CT_overall, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE} 
 
 ttac1 <- tables_proportion_ft(xi = tac1$pre$x, 
                               ni = tac1$pre$totalparticipants,
                               analysis = tac1)
 
-plot_individual_proportion_ft(words = ttac1$b,
+plot_individual_proportion_ft(words = as.matrix(ttac1$b),
                               numbers = ttac1$c,
                               sizebox = 0.025,
                               box_ma_results = tac1$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
+</details>
   
   
-  + <details><summary> Suppl. Figure 5: (FT) Frequency of Incidental Magnetic Resonance Imaging diagnosis in patients with TC </summary>
-  <p>
+<details><summary> Suppl. Figure 5: (FT) Frequency of Incidental Magnetic Resonance Imaging diagnosis in patients with TC </summary>
+  
 ```{r ft_mri_overall, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE} 
 
 tmri1 <- tables_proportion_ft(xi = mri1$pre$x, 
                               ni = mri1$pre$n,
                               analysis = mri1)
 
-plot_individual_proportion_ft(words = tmri1$b,
+plot_individual_proportion_ft(words = as.matrix(tmri1$b),
                               numbers = tmri1$c,
                               sizebox = 0.025,
                               box_ma_results = mri1$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
-  + <details><summary> Suppl. Figure 6: (FT) Frequency of Incidental Positron Emission Tomography diagnosis in patients with TC </summary>
-  <p>
+
+</details>
+
+<details><summary> Suppl. Figure 6: (FT) Frequency of Incidental Positron Emission Tomography diagnosis in patients with TC </summary>
+
 ```{r ft_pet_overall, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE} 
 
 tpet1 <- tables_proportion_ft(xi = pet1$pre$x, 
                               ni = pet1$pre$n,
                               analysis = pet1)
 
-plot_individual_proportion_ft(words = tpet1$b,
+plot_individual_proportion_ft(words = as.matrix(tpet1$b),
                               numbers = tpet1$c,
                               sizebox = 0.025,
                               box_ma_results = pet1$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
-  + <details><summary> Suppl. Figure 7: (FT) Frequency of Incidental histology diagnosis in patients with TC </summary>
-  <p>
+
+</details>
+
+<details><summary> Suppl. Figure 7: (FT) Frequency of Incidental histology diagnosis in patients with TC </summary>
+  
 ```{r ft_histology_overall, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE}
 thist1 <- tables_proportion_ft(xi = hist1$pre$x, 
                               ni = hist1$pre$n,
                               analysis = hist1)
 
-plot_individual_proportion_ft(words = thist1$b,
+plot_individual_proportion_ft(words = as.matrix(thist1$b),
                               numbers = thist1$c,
                               sizebox = 0.05,
                               box_ma_results = hist1$ma,
                               overall_box = 1.5)
 ```
-  </p>
-  </details>
   
-
-  + <details><summary> Suppl. Figure 8: (FT) Frequency of Incidental diagnosis in Male patients with TC </summary>
-  <p>
+</details>
+  
+<details><summary> Suppl. Figure 8: (FT) Frequency of Incidental diagnosis in Male patients with TC </summary>
+  
 ```{r ft_incidental_male, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE}
 tinc3 <- tables_proportion_ft(xi = inc3$pre$x, 
                               ni = inc3$pre$n,
                               analysis = inc3)
 
-plot_individual_proportion_ft(words = tinc3$b,
+plot_individual_proportion_ft(words = as.matrix(tinc3$b),
                               numbers = tinc3$c,
                               sizebox = 0.04,
                               box_ma_results = inc3$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
 
+</details>
 
-  + <details><summary> Suppl. Figure 9: (FT) Frequency of Incidental diagnosis in Female patients with TC </summary>
-  <p>
+<details><summary> Suppl. Figure 9: (FT) Frequency of Incidental diagnosis in Female patients with TC </summary>
+  
 ```{r ft_incidental_female, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 tinc5 <- tables_proportion_ft(xi = inc5$pre$x, 
                               ni = inc5$pre$n,
                               analysis = inc5)
 
-plot_individual_proportion_ft(words = tinc5$b,
+plot_individual_proportion_ft(words = as.matrix(tinc5$b),
                               numbers = tinc5$c,
                               sizebox = 0.040,
                               box_ma_results = inc5$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
-  
 
-  + <details><summary> Suppl. Figure 10: (FT) Frequency of Incidental diagnosis in patients aged 45 years and older with TC </summary>
-  <p>
+</details>
+  
+<details><summary> Suppl. Figure 10: (FT) Frequency of Incidental diagnosis in patients aged 45 years and older with TC </summary>
+  
 ```{r ft_incidental_45older, echo=FALSE, fig.height=1, fig.width=11, message=FALSE, warning=FALSE}
 tinc7 <- table_singleproportion_ft(xi = inc7$pre$x, 
                                   ni = inc7$pre$n,
@@ -1113,138 +1006,133 @@ tinc7 <- table_singleproportion_ft(xi = inc7$pre$x,
 
 
 
-plot_single_proportion_ft(words = tinc7$b,
+plot_single_proportion_ft(words = as.matrix(tinc7$b),
                           numbers = tinc7$c,
                           overall_box = 1)
 
 
 ```
-  </p>
-  </details>
+  
+</details>
 
-
-  + <details><summary> Suppl. Figure 11: (FT) Frequency of Incidental diagnosis in patients aged 45 years and younger with TC </summary>
-  <p>
+<details><summary> Suppl. Figure 11: (FT) Frequency of Incidental diagnosis in patients aged 45 years and younger with TC </summary>
+  
 ```{r ft_incidental_45younger, echo=FALSE, fig.height=1, fig.width=11, message=FALSE, warning=FALSE}
 tinc9 <- table_singleproportion_ft(xi = inc9$pre$x, 
                                   ni = inc9$pre$n,
                                   analysis = inc9)
 
-plot_single_proportion_ft(words = tinc9$b,
+plot_single_proportion_ft(words = as.matrix(tinc9$b),
                           numbers = tinc9$c,
                           overall_box = 1)
 
 
 ```
-  </p>
-  </details>
+
+</details>
   
   
-  + <details><summary> Suppl. Figure 12: (FT) Frequency of Incidental diagnosis in patients with TC and  tumor size >10mm </summary>
-  <p>
+<details><summary> Suppl. Figure 12: (FT) Frequency of Incidental diagnosis in patients with TC and  tumor size >10mm </summary>
+
 ```{r ft_incidental_greater10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 tinc11 <- tables_proportion_ft(xi = inc11$pre$x, 
                               ni = inc11$pre$n,
                               analysis = inc11,
                               tumorsize = TRUE)
 
-plot_individual_proportion_ft(words = tinc11$b,
+plot_individual_proportion_ft(words = as.matrix(tinc11$b),
                               numbers = tinc11$c,
                               sizebox = 0.040,
                               box_ma_results = inc11$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
+
+</details>
 
   
-  + <details><summary> Suppl. Figure 13: (FT) Frequency of Incidental diagnosis in patients with TC and tumor size <10mm </summary>
-  <p>
+<details><summary> Suppl. Figure 13: (FT) Frequency of Incidental diagnosis in patients with TC and tumor size <10mm </summary>
+  
 ```{r ft_incidental_less10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 tinc13 <- tables_proportion_ft(xi = inc13$pre$x, 
                               ni = inc13$pre$n,
                               analysis = inc13,
                               tumorsize = TRUE)
 
-plot_individual_proportion_ft(words = tinc13$b,
+plot_individual_proportion_ft(words = as.matrix(tinc13$b),
                               numbers = tinc13$c,
                               sizebox = 0.040,
                               box_ma_results = inc13$ma,
                               overall_box = 1.5)
 ```
-  </p>
-  </details>
+  
+</details>
 
-
-  + <details><summary> Suppl. Figure 14: (FT) Frequency of Incidental diagnosis in patients with TC from the USA </summary>
-  <p>
+<details><summary> Suppl. Figure 14: (FT) Frequency of Incidental diagnosis in patients with TC from the USA </summary>
+  
 ```{r ft_incidental_USA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 tinc15 <- tables_proportion_ft(xi = inc15$pre$x, 
                               ni = inc15$pre$n,
                               analysis = inc15)
 
-plot_individual_proportion_ft(words = tinc15$b,
+plot_individual_proportion_ft(words = as.matrix(tinc15$b),
                               numbers = tinc15$c,
                               sizebox = 0.040,
                               box_ma_results = inc15$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
 
+</details>
 
-  + <details><summary> Suppl. Figure 15: (FT) Frequency of Incidental diagnosis in patients with TC from a non-USA country </summary>
-  <p>
+<details><summary> Suppl. Figure 15: (FT) Frequency of Incidental diagnosis in patients with TC from a non-USA country </summary>
+  
 ```{r ft_incidental_nonUSA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 tinc17 <- tables_proportion_ft(xi = inc17$pre$x, 
                               ni = inc17$pre$n,
                               analysis = inc17)
 
-plot_individual_proportion_ft(words = tinc17$b,
+plot_individual_proportion_ft(words = as.matrix(tinc17$b),
                               numbers = tinc17$c,
                               sizebox = 0.040,
                               box_ma_results = inc17$ma,
                               overall_box = 1)
 
 ```
-  </p>
-  </details>
 
+</details>
 
-  + <details><summary> Suppl. Figure 16: (FT) Frequency of Incidental diagnosis in patients with TC from population based studies </summary>
-  <p>
+<details><summary> Suppl. Figure 16: (FT) Frequency of Incidental diagnosis in patients with TC from population based studies </summary>
+  
 ```{r ft_incidental_pop, echo=FALSE, fig.height=2.5, fig.width=12, message=FALSE, warning=FALSE}
 tinc19 <- tables_proportion_ft(xi = inc19$pre$x, 
                               ni = inc19$pre$n,
                               analysis = inc19)
 
-plot_individual_proportion_ft(words = tinc19$b,
+plot_individual_proportion_ft(words = as.matrix(tinc19$b),
                               numbers = tinc19$c,
                               sizebox = 0.015,
                               box_ma_results = inc19$ma,
                               overall_box = 1.5)
 ```
-  </p>
-  </details>
+
+</details>
 
 
-  + <details><summary> Suppl. Figure 17: (FT) Frequency of Incidental diagnosis in patients with TC from non-population-based studies </summary>
-  <p>
+<details><summary> Suppl. Figure 17: (FT) Frequency of Incidental diagnosis in patients with TC from non-population-based studies </summary>
+  
 ```{r ft_incidental_nonpop, echo=FALSE, fig.height=5, fig.width=12, message=FALSE, warning=FALSE}
 tinc21 <- tables_proportion_ft(xi = inc21$pre$x, 
                               ni = inc21$pre$n,
                               analysis = inc21)
 
-plot_individual_proportion_ft(words = tinc21$b,
+plot_individual_proportion_ft(words = as.matrix(tinc21$b),
                               numbers = tinc21$c,
                               sizebox = 0.040,
                               box_ma_results = inc21$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
-
+  
 </details>
+
 
 
 ## Figure 4. Imaging and Histological Incidental diagnosis in patients with Thyroid Cancer by population group
@@ -1411,385 +1299,384 @@ forestplot(prevalence,
 
 
 
-> **Show supplementary figures used to generate Figure 4**
+### Supplementary figures used to generate Figure 4
 
 
-<details><summary>Click to show</summary>
 
 
-  + <details><summary> Suppl. Figure 2: (FT) Frequency of Incidental Imaging diagnosis in patients with TC </summary>
-  <p>
+<details><summary> Suppl. Figure 2: (FT) Frequency of Incidental Imaging diagnosis in patients with TC </summary>
+  
 ```{r ft_imaging_overall_copy, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE} 
 
 ti1 <- tables_proportion_ft(xi = i1$pre$x, 
                               ni = i1$pre$n,
                               analysis = i1)
 
-plot_individual_proportion_ft(words = ti1$b,
+plot_individual_proportion_ft(words = as.matrix(ti1$b),
                               numbers = ti1$c,
                               sizebox = 0.05,
                               box_ma_results = i1$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
+  
+</details>
 
 
-  + <details><summary> Suppl. Figure 18: (FT) Frequency of Incidental Imaging diagnosis in Male patients with TC </summary>
-<p>
+<details><summary> Suppl. Figure 18: (FT) Frequency of Incidental Imaging diagnosis in Male patients with TC </summary>
+
 ```{r ft_imaging_male, echo=FALSE, fig.height=2, fig.width=12, message=FALSE, warning=FALSE}
 ti3 <- tables_proportion_ft(xi = i3$pre$x, 
                               ni = i3$pre$n,
                               analysis = i3)
 
-plot_individual_proportion_ft(words = ti3$b,
+plot_individual_proportion_ft(words = as.matrix(ti3$b),
                               numbers = ti3$c,
                               sizebox = 0.012,
                               box_ma_results = i3$ma,
                               overall_box = 1.5)
 ```
-  </p>
-  </details>
+  
+</details>
 
-
-  + <details><summary> Suppl. Figure 19: (FT) Frequency of Incidental Imaging diagnosis in Female patients with TC </summary>
-  <p>
+<details><summary> Suppl. Figure 19: (FT) Frequency of Incidental Imaging diagnosis in Female patients with TC </summary>
+  
 ```{r ft_imaging_female, echo=FALSE, fig.height=2, fig.width=12, message=FALSE, warning=FALSE}
 ti5 <- tables_proportion_ft(xi = i5$pre$x, 
                               ni = i5$pre$n,
                               analysis = i5)
 
-plot_individual_proportion_ft(words = ti5$b,
+plot_individual_proportion_ft(words = as.matrix(ti5$b),
                               numbers = ti5$c,
                               sizebox = 0.012,
                               box_ma_results = i5$ma,
                               overall_box = 1.5)
 ```
-  </p>
-  </details>
+  
+</details>
 
-  + <details><summary> Suppl. Figure 20: (FT) Frequency of Incidental Imaging diagnosis in patients aged 45 years and older with TC </summary>
-  <p>
+<details><summary> Suppl. Figure 20: (FT) Frequency of Incidental Imaging diagnosis in patients aged 45 years and older with TC </summary>
+  
 ```{r ft_imaging_45older, echo=FALSE, fig.height=1, fig.width=11, message=FALSE, warning=FALSE}
 ti7 <- table_singleproportion_ft(xi = i7$pre$x, 
                                   ni = i7$pre$n,
                                   analysis = i7)
 
-plot_single_proportion_ft(words = ti7$b,
+plot_single_proportion_ft(words = as.matrix(ti7$b),
                           numbers = ti7$c,
                           overall_box = 1)
 
 
 ```
-  </p>
-  </details>
+  
+</details>
   
   
-  + <details><summary> Suppl. Figure 21: (FT) Frequency of Incidental Imaging diagnosis in patients aged 45 years and younger with TC </summary>
-  <p>
+<details><summary> Suppl. Figure 21: (FT) Frequency of Incidental Imaging diagnosis in patients aged 45 years and younger with TC </summary>
+  
 ```{r ft_imaging_45younger, echo=FALSE, fig.height=1, fig.width=11, message=FALSE, warning=FALSE}
 ti9 <- table_singleproportion_ft(xi = i9$pre$x, 
                                   ni = i9$pre$n,
                                   analysis = i9)
 
-plot_single_proportion_ft(words = ti9$b,
+plot_single_proportion_ft(words = as.matrix(ti9$b),
                           numbers = ti9$c,
                           overall_box = 1)
 
 
 ```
-  </p>
-  </details>
+  
+</details>
   
 
-  + <details><summary> Suppl. Figure 22: (FT) Frequency of Incidental Imaging diagnosis in patients with TC and  tumor size >10mm </summary>
-  <p>
+<details><summary> Suppl. Figure 22: (FT) Frequency of Incidental Imaging diagnosis in patients with TC and  tumor size >10mm </summary>
+  
 ```{r ft_imaging_greater10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 ti11 <- tables_proportion_ft(xi = i11$pre$x, 
                               ni = i11$pre$n,
                               analysis = i11,
                               tumorsize = TRUE)
 
-plot_individual_proportion_ft(words = ti11$b,
+plot_individual_proportion_ft(words = as.matrix(ti11$b),
                               numbers = ti11$c,
                               sizebox = 0.040,
                               box_ma_results = i11$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
+  
+</details>
 
   
-  + <details><summary> Suppl. Figure 23: (FT) Frequency of Incidental Imaging diagnosis in patients with TC and tumor size <10mm </summary>
-  <p>
+<details><summary> Suppl. Figure 23: (FT) Frequency of Incidental Imaging diagnosis in patients with TC and tumor size <10mm </summary>
+  
 ```{r ft_imaging_less10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 ti13 <- tables_proportion_ft(xi = i13$pre$x, 
                               ni = i13$pre$n,
                               analysis = i13,
                               tumorsize = TRUE)
 
-plot_individual_proportion_ft(words = ti13$b,
+plot_individual_proportion_ft(words = as.matrix(ti13$b),
                               numbers = ti13$c,
                               sizebox = 0.025,
                               box_ma_results = i13$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
   
-  + <details><summary> Suppl. Figure 24: (FT) Frequency of Incidental Imaging diagnosis in patients with TC from the USA </summary>
-  <p>
+</details>
+  
+<details><summary> Suppl. Figure 24: (FT) Frequency of Incidental Imaging diagnosis in patients with TC from the USA </summary>
+  
 ```{r ft_imaging_USA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 ti15 <- tables_proportion_ft(xi = i15$pre$x, 
                               ni = i15$pre$n,
                               analysis = i15)
 
-plot_individual_proportion_ft(words = ti15$b,
+plot_individual_proportion_ft(words = as.matrix(ti15$b),
                               numbers = ti15$c,
                               sizebox = 0.030,
                               box_ma_results = i15$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
-  + <details><summary> Suppl. Figure 25: (FT) Frequency of Incidental Imaging diagnosis in patients with TC from a non-USA country </summary>
-  <p>
+  
+</details>
+
+<details><summary> Suppl. Figure 25: (FT) Frequency of Incidental Imaging diagnosis in patients with TC from a non-USA country </summary>
+  
 ```{r ft_imaging_nonUSA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 ti17 <- tables_proportion_ft(xi = i17$pre$x, 
                               ni = i17$pre$n,
                               analysis = i17)
 
-plot_individual_proportion_ft(words = ti17$b,
+plot_individual_proportion_ft(words = as.matrix(ti17$b),
                               numbers = ti17$c,
                               sizebox = 0.040,
                               box_ma_results = i17$ma,
                               overall_box = 1)
 
 ```
-  </p>
-  </details>
-  + <details><summary> Suppl. Figure 26: (FT) Frequency of Incidental Imaging diagnosis in patients with TC from population based studies </summary>
-  <p>
+  
+</details>
+
+<details><summary> Suppl. Figure 26: (FT) Frequency of Incidental Imaging diagnosis in patients with TC from population based studies </summary>
+  
 ```{r ft_imaging_pop, echo=FALSE, fig.height=2.5, fig.width=12, message=FALSE, warning=FALSE}
 ti19 <- tables_proportion_ft(xi = i19$pre$x, 
                               ni = i19$pre$n,
                               analysis = i19)
 
-plot_individual_proportion_ft(words = ti19$b,
+plot_individual_proportion_ft(words = as.matrix(ti19$b),
                               numbers = ti19$c,
                               sizebox = 0.015,
                               box_ma_results = i19$ma,
                               overall_box = 1.5)
 ```
-  </p>
-  </details>
-  + <details><summary> Suppl. Figure 27: (FT) Frequency of Incidental Imaging diagnosis in patients with TC from non-population-based studies </summary>
-  <p>
+
+</details>
+
+<details><summary> Suppl. Figure 27: (FT) Frequency of Incidental Imaging diagnosis in patients with TC from non-population-based studies </summary>
+  
 ```{r ft_imaging_nonpop, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE}
 ti21 <- tables_proportion_ft(xi = i21$pre$x, 
                               ni = i21$pre$n,
                               analysis = i21)
 
-plot_individual_proportion_ft(words = ti21$b,
+plot_individual_proportion_ft(words = as.matrix(ti21$b),
                               numbers = ti21$c,
                               sizebox = 0.040,
                               box_ma_results = i21$ma,
                               overall_box = 1.5)
 ```
-  </p>
-  </details>
-  + <details><summary> Suppl. Figure 7: (FT) Frequency of Incidental Histology diagnosis in patients with TC </summary>
-  <p>
+
+</details>
+
+<details><summary> Suppl. Figure 7: (FT) Frequency of Incidental Histology diagnosis in patients with TC </summary>
+  
 ```{r ft_histology_overall_copy, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE}
 thist1 <- tables_proportion_ft(xi = hist1$pre$x, 
                               ni = hist1$pre$n,
                               analysis = hist1)
 
-plot_individual_proportion_ft(words = thist1$b,
+plot_individual_proportion_ft(words = as.matrix(thist1$b),
                               numbers = thist1$c,
                               sizebox = 0.05,
                               box_ma_results = hist1$ma,
                               overall_box = 1.5)
 ```
-  </p>
-  </details>
-  + <details><summary> Suppl. Figure 28: (FT) Frequency of Incidental Histology diagnosis in Male patients with TC </summary>
-  <p>
+
+</details>
+
+<details><summary> Suppl. Figure 28: (FT) Frequency of Incidental Histology diagnosis in Male patients with TC </summary>
+  
 ```{r ft_histology_male, echo=FALSE, fig.height=2, fig.width=12, message=FALSE, warning=FALSE}
 thist3 <- tables_proportion_ft(xi = hist3$pre$x, 
                               ni = hist3$pre$n,
                               analysis = hist3)
 
-plot_individual_proportion_ft(words = thist3$b,
+plot_individual_proportion_ft(words = as.matrix(thist3$b),
                               numbers = thist3$c,
                               sizebox = 0.025,
                               box_ma_results = hist3$ma,
                               overall_box = 1.5)
 ```
-  </p>
-  </details>
-  + <details><summary> Suppl. Figure 29: (FT) Frequency of Incidental Histology diagnosis in Female patients with TC </summary>
-  <p>
+
+</details>
+  
+<details><summary> Suppl. Figure 29: (FT) Frequency of Incidental Histology diagnosis in Female patients with TC </summary>
+  
 ```{r ft_histology_female, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 thist5 <- tables_proportion_ft(xi = hist5$pre$x, 
                               ni = hist5$pre$n,
                               analysis = hist5)
 
-plot_individual_proportion_ft(words = thist5$b,
+plot_individual_proportion_ft(words = as.matrix(thist5$b),
                               numbers = thist5$c,
                               sizebox = 0.025,
                               box_ma_results = hist5$ma,
                               overall_box = 1.5)
 ```
-  </p>
-  </details>
 
+</details>
 
-  + <details><summary> Suppl. Figure 30: (FT) Frequency of Incidental Histology diagnosis in patients aged 45 years and older with TC </summary>
-  <p>
+<details><summary> Suppl. Figure 30: (FT) Frequency of Incidental Histology diagnosis in patients aged 45 years and older with TC </summary>
+  
 ```{r ft_histology_45older, echo=FALSE, fig.height=1, fig.width=11, message=FALSE, warning=FALSE}
 thist7 <- table_singleproportion_ft(xi = hist7$pre$x, 
                                   ni = hist7$pre$n,
                                   analysis = hist7)
 
-plot_single_proportion_ft(words = thist7$b,
+plot_single_proportion_ft(words = as.matrix(thist7$b),
                           numbers = thist7$c,
                           overall_box = 1)
 
 
 ```
-  </p>
-  </details>
+
+</details>
+
+<details><summary> Suppl. Figure 31: (FT) Frequency of Incidental Histology diagnosis in patients aged 45 years and younger with TC </summary>
   
-  
-  + <details><summary> Suppl. Figure 31: (FT) Frequency of Incidental Histology diagnosis in patients aged 45 years and younger with TC </summary>
-  <p>
 ```{r ft_histology_45younger, echo=FALSE, fig.height=1, fig.width=11, message=FALSE, warning=FALSE}
 thist9 <- table_singleproportion_ft(xi = hist9$pre$x, 
                                   ni = hist9$pre$n,
                                   analysis = hist9)
 
-plot_single_proportion_ft(words = thist9$b,
+plot_single_proportion_ft(words = as.matrix(thist9$b),
                           numbers = thist9$c,
                           overall_box = 1)
 
 
 ```
-  </p>
-  </details>
 
+</details>
 
-  + <details><summary> Suppl. Figure 32: (FT) Frequency of Incidental Histology diagnosis in patients with TC and  tumor size >10mm </summary>
-  <p>
+<details><summary> Suppl. Figure 32: (FT) Frequency of Incidental Histology diagnosis in patients with TC and  tumor size >10mm </summary>
+  
 ```{r ft_histology_greater10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 thist11 <- tables_proportion_ft(xi = hist11$pre$x, 
                               ni = hist11$pre$n,
                               analysis = hist11,
                               tumorsize = TRUE)
 
-plot_individual_proportion_ft(words = thist11$b,
+plot_individual_proportion_ft(words = as.matrix(thist11$b),
                               numbers = thist11$c,
                               sizebox = 0.025,
                               box_ma_results = hist11$ma,
                               overall_box = 1.5)
 
 ```
-  </p>
-  </details>
+
+</details>
   
+<details><summary> Suppl. Figure 33: (FT) Frequency of Incidental Histology diagnosis in patients with TC and tumor size <10mm </summary>
   
-  + <details><summary> Suppl. Figure 33: (FT) Frequency of Incidental Histology diagnosis in patients with TC and tumor size <10mm </summary>
-  <p>
 ```{r ft_histidental_less10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 thist13 <- tables_proportion_ft(xi = hist13$pre$x, 
                               ni = hist13$pre$n,
                               analysis = hist13,
                               tumorsize = TRUE)
 
-plot_individual_proportion_ft(words = thist13$b,
+plot_individual_proportion_ft(words = as.matrix(thist13$b),
                               numbers = thist13$c,
                               sizebox = 0.025,
                               box_ma_results = hist13$ma,
                               overall_box = 1.5)
 ```
-  </p>
-  </details>
+
+</details>
   
   
-  + <details><summary> Suppl. Figure 34: (FT) Frequency of Incidental Histology diagnosis in patients with TC from the USA </summary>
-  <p>
+<details><summary> Suppl. Figure 34: (FT) Frequency of Incidental Histology diagnosis in patients with TC from the USA </summary>
+  
 ```{r ft_histology_USA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 thist15 <- tables_proportion_ft(xi = hist15$pre$x, 
                               ni = hist15$pre$n,
                               analysis = hist15)
 
-plot_individual_proportion_ft(words = thist15$b,
+plot_individual_proportion_ft(words = as.matrix(thist15$b),
                               numbers = thist15$c,
                               sizebox = 0.025,
                               box_ma_results = hist15$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
+
+</details>
   
   
-  + <details><summary> Suppl. Figure 35: (FT) Frequency of Incidental Histology diagnosis in patients with TC from a non-USA country </summary>
-  <p>
+<details><summary> Suppl. Figure 35: (FT) Frequency of Incidental Histology diagnosis in patients with TC from a non-USA country </summary>
+  
 ```{r ft_histology_nonUSA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 thist17 <- tables_proportion_ft(xi = hist17$pre$x, 
                               ni = hist17$pre$n,
                               analysis = hist17)
 
-plot_individual_proportion_ft(words = thist17$b,
+plot_individual_proportion_ft(words = as.matrix(thist17$b),
                               numbers = thist17$c,
                               sizebox = 0.040,
                               box_ma_results = hist17$ma,
                               overall_box = 1)
 
 ```
-  </p>
-  </details>
+
+</details>
   
   
-  + <details><summary> Suppl. Figure 36: (FT) Frequency of Incidental Histology diagnosis in patients with TC from population based studies </summary>
-  <p>
+<details><summary> Suppl. Figure 36: (FT) Frequency of Incidental Histology diagnosis in patients with TC from population based studies </summary>
+  
 ```{r ft_histology_pop, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 thist19 <- tables_proportion_ft(xi = hist19$pre$x, 
                               ni = hist19$pre$n,
                               analysis = hist19)
 
-plot_individual_proportion_ft(words = thist19$b,
+plot_individual_proportion_ft(words = as.matrix(thist19$b),
                               numbers = thist19$c,
                               sizebox = 0.0125,
                               box_ma_results = hist19$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
+
+</details>
   
+<details><summary> Suppl. Figure 37: (FT) Frequency of Incidental Histology diagnosis in patients with TC from non-population-based studies </summary>
   
-  + <details><summary> Suppl. Figure 37: (FT) Frequency of Incidental Histology diagnosis in patients with TC from non-population-based studies </summary>
-  <p>
 ```{r ft_histology_nonpop, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE}
 thist21 <- tables_proportion_ft(xi = hist21$pre$x, 
                               ni = hist21$pre$n,
                               analysis = hist21)
 
-plot_individual_proportion_ft(words = thist21$b,
+plot_individual_proportion_ft(words = as.matrix(thist21$b),
                               numbers = thist21$c,
                               sizebox = 0.040,
                               box_ma_results = hist21$ma,
                               overall_box = 1)
 ```
-  </p>
-  </details>
 
 </details>
 
 
 
 
-## Suppl. Figures using Generalized linear mixed models (GLMM) analysis 
+
+
+## Sensitivity analysis using Generalized linear mixed models (GLMM) 
 
 <br />
 
@@ -1797,148 +1684,166 @@ plot_individual_proportion_ft(words = thist21$b,
 
 <details><summary> Suppl. Figure 38: (GLMM) Frequency of Incidental diagnosis in patients with TC </summary>
 <p>
+
 ```{r glmm_incidental_overall, echo=FALSE, fig.height=5, fig.width=11, message=FALSE, warning=FALSE} 
 
 tinc2 <- tables_proportion_glmm(xi = inc2$pre$x, 
                               ni = inc2$pre$n,
                               analysis = inc2)
 
-plot_individual_proportion_glmm(words = tinc2$b,
+plot_individual_proportion_glmm(words = as.matrix(tinc2$b),
                               numbers = tinc2$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 39: (GLMM) Frequency of Incidental diagnosis in Male patients with TC </summary>
 <p>
+
 ```{r glmm_incidental_male, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE}
 tinc4 <- tables_proportion_glmm(xi = inc4$pre$x, 
                               ni = inc4$pre$n,
                               analysis = inc4)
 
-plot_individual_proportion_glmm(words = tinc4$b,
+plot_individual_proportion_glmm(words = as.matrix(tinc4$b),
                               numbers = tinc4$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 40: (GLMM) Frequency of Incidental diagnosis in Female patients with TC </summary>
 <p>
+
 ```{r glmm_incidental_female, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 tinc6 <- tables_proportion_glmm(xi = inc6$pre$x, 
                               ni = inc6$pre$n,
                               analysis = inc6)
 
-plot_individual_proportion_glmm(words = tinc6$b,
+plot_individual_proportion_glmm(words = as.matrix(tinc6$b),
                               numbers = tinc6$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 41: (GLMM) Frequency of Incidental diagnosis in patients with TC and  tumor size >10mm </summary>
 <p>
+
 ```{r glmm_incidental_greater10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 tinc12 <- tables_proportion_glmm(xi = inc12$pre$x, 
                               ni = inc12$pre$n,
                               analysis = inc12,
                               tumorsize = TRUE)
 
-plot_individual_proportion_glmm(words = tinc12$b,
+plot_individual_proportion_glmm(words = as.matrix(tinc12$b),
                               numbers = tinc12$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
   
 <details><summary> Suppl. Figure 42: (GLMM) Frequency of Incidental diagnosis in patients with TC and tumor size <10mm </summary>
 <p>
+
 ```{r glmm_incidental_less10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 tinc14 <- tables_proportion_glmm(xi = inc14$pre$x, 
                               ni = inc14$pre$n,
                               analysis = inc14,
                               tumorsize = TRUE)
 
-plot_individual_proportion_glmm(words = tinc14$b,
+plot_individual_proportion_glmm(words = as.matrix(tinc14$b),
                               numbers = tinc14$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 43: (GLMM) Frequency of Incidental diagnosis in patients with TC from the USA </summary>
 <p>
+
 ```{r glmm_incidental_USA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 tinc16 <- tables_proportion_glmm(xi = inc16$pre$x, 
                               ni = inc16$pre$n,
                               analysis = inc16)
 
-plot_individual_proportion_glmm(words = tinc16$b,
+plot_individual_proportion_glmm(words = as.matrix(tinc16$b),
                               numbers = tinc16$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 44: (GLMM) Frequency of Incidental diagnosis in patients with TC from a non-USA country </summary>
 <p>
+
 ```{r glmm_incidental_nonUSA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 tinc18 <- tables_proportion_glmm(xi = inc18$pre$x, 
                               ni = inc18$pre$n,
                               analysis = inc18)
 
-plot_individual_proportion_glmm(words = tinc18$b,
+plot_individual_proportion_glmm(words = as.matrix(tinc18$b),
                               numbers = tinc18$c,
                               ind_box = 0.5,
                               overall_box = 1)
 
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 45: (GLMM) Frequency of Incidental diagnosis in patients with TC from population based studies </summary>
 <p>
+
 ```{r glmm_incidental_pop, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 tinc20 <- tables_proportion_glmm(xi = inc20$pre$x, 
                               ni = inc20$pre$n,
                               analysis = inc20)
 
-plot_individual_proportion_glmm(words = tinc20$b,
+plot_individual_proportion_glmm(words = as.matrix(tinc20$b),
                               numbers = tinc20$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 46: (GLMM) Frequency of Incidental diagnosis in patients with TC from non-population-based studies </summary>
 <p>
+
 ```{r glmm_incidental_nonpop, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
 tinc22 <- tables_proportion_glmm(xi = inc22$pre$x, 
                               ni = inc22$pre$n,
                               analysis = inc22)
 
-plot_individual_proportion_glmm(words = tinc22$b,
+plot_individual_proportion_glmm(words = as.matrix(tinc22$b),
                               numbers = tinc22$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
@@ -1956,142 +1861,159 @@ ti2 <- tables_proportion_glmm(xi = i2$pre$x,
                               ni = i2$pre$n,
                               analysis = i2)
 
-plot_individual_proportion_glmm(words = ti2$b,
+plot_individual_proportion_glmm(words = as.matrix(ti2$b),
                               numbers = ti2$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 48: (GLMM) Frequency of Incidental imaging diagnosis in Male patients with TC </summary>
 <p>
+
 ```{r glmm_imaging_male, echo=FALSE, fig.height=2, fig.width=12, message=FALSE, warning=FALSE}
 ti4 <- tables_proportion_glmm(xi = i4$pre$x, 
                               ni = i4$pre$n,
                               analysis = i4)
 
-plot_individual_proportion_glmm(words = ti4$b,
+plot_individual_proportion_glmm(words = as.matrix(ti4$b),
                               numbers = ti4$c,
                               ind_box = 0.5,
                               overall_box = 1.5)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 49: (GLMM) Frequency of Incidental imaging diagnosis in Female patients with TC </summary>
 <p>
+
 ```{r glmm_imaging_female, echo=FALSE, fig.height=2, fig.width=12, message=FALSE, warning=FALSE}
 ti6 <- tables_proportion_glmm(xi = i6$pre$x, 
                               ni = i6$pre$n,
                               analysis = i6)
 
-plot_individual_proportion_glmm(words = ti6$b,
+plot_individual_proportion_glmm(words = as.matrix(ti6$b),
                               numbers = ti6$c,
                               ind_box = 0.5,
                               overall_box = 1.5)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 50: (GLMM) Frequency of Incidental imaging diagnosis in patients with TC and  tumor size >10mm </summary>
 <p>
+
 ```{r glmm_imaging_greater10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 ti12 <- tables_proportion_glmm(xi = i12$pre$x, 
                               ni = i12$pre$n,
                               analysis = i12,
                               tumorsize = TRUE)
 
-plot_individual_proportion_glmm(words = ti12$b,
+plot_individual_proportion_glmm(words = as.matrix(ti12$b),
                               numbers = ti12$c,
                               ind_box = 0.5,
                               overall_box = 1.5)
 ```
+
 </p>
 </details>
 
   
 <details><summary> Suppl. Figure 51: (GLMM) Frequency of Incidental imaging diagnosis in patients with TC and tumor size <10mm </summary>
 <p>
+
 ```{r glmm_imaging_less10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 ti14 <- tables_proportion_glmm(xi = i14$pre$x, 
                               ni = i14$pre$n,
                               analysis = i14,
                               tumorsize = TRUE)
 
-plot_individual_proportion_glmm(words = ti14$b,
+plot_individual_proportion_glmm(words = as.matrix(ti14$b),
                               numbers = ti14$c,
                               ind_box = 0.5,
                               overall_box = 1.5)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 52: (GLMM) Frequency of Incidental imaging diagnosis in patients with TC from the USA </summary>
 <p>
+
 ```{r glmm_imaging_USA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 ti16 <- tables_proportion_glmm(xi = i16$pre$x, 
                               ni = i16$pre$n,
                               analysis = i16)
 
-plot_individual_proportion_glmm(words = ti16$b,
+plot_individual_proportion_glmm(words = as.matrix(ti16$b),
                               numbers = ti16$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 53: (GLMM) Frequency of Incidental imaging diagnosis in patients with TC from a non-USA country </summary>
 <p>
+
 ```{r glmm_imaging_nonUSA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 ti18 <- tables_proportion_glmm(xi = i18$pre$x, 
                               ni = i18$pre$n,
                               analysis = i18)
 
-plot_individual_proportion_glmm(words = ti18$b,
+plot_individual_proportion_glmm(words = as.matrix(ti18$b),
                               numbers = ti18$c,
                               ind_box = 0.5,
                               overall_box = 1)
 
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 54: (GLMM) Frequency of Incidental imaging diagnosis in patients with TC from population based studies </summary>
 <p>
+
 ```{r glmm_imaging_pop, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 ti20 <- tables_proportion_glmm(xi = i20$pre$x, 
                               ni = i20$pre$n,
                               analysis = i20)
 
-plot_individual_proportion_glmm(words = ti20$b,
+plot_individual_proportion_glmm(words = as.matrix(ti20$b),
                               numbers = ti20$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 55: (GLMM) Frequency of Incidental imaging diagnosis in patients with TC from non-population-based studies </summary>
 <p>
+
 ```{r glmm_imaging_nonpop, echo=FALSE, fig.height=6, fig.width=12, message=FALSE, warning=FALSE}
 ti22 <- tables_proportion_glmm(xi = i22$pre$x, 
                               ni = i22$pre$n,
                               analysis = i22)
 
-plot_individual_proportion_glmm(words = ti22$b,
+plot_individual_proportion_glmm(words = as.matrix(ti22$b),
                               numbers = ti22$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
@@ -2103,17 +2025,19 @@ plot_individual_proportion_glmm(words = ti22$b,
 
 <details><summary> Suppl. Figure 56: (GLMM) Frequency of Incidental Ultrasound diagnosis in patients with TC </summary>
 <p>
+
 ```{r glmm_ultrasound_overall, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE} 
 
 tus2 <- tables_proportion_glmm(xi = us2$pre$x, 
                               ni = us2$pre$n,
                               analysis = us2)
 
-plot_individual_proportion_glmm(words = tus2$b,
+plot_individual_proportion_glmm(words = as.matrix(tus2$b),
                               numbers = tus2$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
@@ -2123,17 +2047,19 @@ plot_individual_proportion_glmm(words = tus2$b,
 
 <details><summary> Suppl. Figure 57: (GLMM) Frequency of Incidental Computed Tomography Scan diagnosis in patients with TC </summary>
 <p>
+
 ```{r glmm_CT_overall, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE} 
 
 ttac2 <- tables_proportion_glmm(xi = tac2$pre$x, 
                               ni = tac2$pre$totalparticipants,
                               analysis = tac2)
 
-plot_individual_proportion_glmm(words = ttac2$b,
+plot_individual_proportion_glmm(words = as.matrix(ttac2$b),
                               numbers = ttac2$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
@@ -2145,17 +2071,19 @@ plot_individual_proportion_glmm(words = ttac2$b,
 
 <details><summary> Suppl. Figure 58: (GLMM) Frequency of Incidental Positron Emission Tomography diagnosis in patients with TC </summary>
 <p>
+
 ```{r glmm_pet_overall, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE} 
 
 tpet2 <- tables_proportion_glmm(xi = pet2$pre$x, 
                               ni = pet2$pre$n,
                               analysis = pet2)
 
-plot_individual_proportion_glmm(words = tpet2$b,
+plot_individual_proportion_glmm(words = as.matrix(tpet2$b),
                               numbers = tpet2$c,
                               ind_box = 0.5,
                               overall_box = 1.5)
 ```
+
 </p>
 </details>
 
@@ -2166,17 +2094,19 @@ plot_individual_proportion_glmm(words = tpet2$b,
 
 <details><summary> Suppl. Figure 59: (GLMM) Frequency of Incidental Magnetic Resonance Imaging diagnosis in patients with TC </summary>
 <p>
+
 ```{r glmm_mri_overall, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE} 
 
 tmri2 <- tables_proportion_glmm(xi = mri2$pre$x, 
                               ni = mri2$pre$n,
                               analysis = mri2)
 
-plot_individual_proportion_glmm(words = tmri2$b,
+plot_individual_proportion_glmm(words = as.matrix(tmri2$b),
                               numbers = tmri2$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
@@ -2187,148 +2117,166 @@ plot_individual_proportion_glmm(words = tmri2$b,
 
 <details><summary> Suppl. Figure 60: (GLMM) Frequency of Incidental histology diagnosis in patients with TC </summary>
 <p>
+
 ```{r glmm_histology_overall, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE}
 thist2 <- tables_proportion_glmm(xi = hist2$pre$x, 
                               ni = hist2$pre$n,
                               analysis = hist2)
 
-plot_individual_proportion_glmm(words = thist2$b,
+plot_individual_proportion_glmm(words = as.matrix(thist2$b),
                               numbers = thist2$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 61: (GLMM) Frequency of Incidental histology diagnosis in Male patients with TC </summary>
 <p>
+
 ```{r glmm_histology_male, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE}
 thist4 <- tables_proportion_glmm(xi = hist4$pre$x, 
                               ni = hist4$pre$n,
                               analysis = hist4)
 
-plot_individual_proportion_glmm(words = thist4$b,
+plot_individual_proportion_glmm(words = as.matrix(thist4$b),
                               numbers = thist4$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 62: (GLMM) Frequency of Incidental Histology diagnosis in Female patients with TC </summary>
 <p>
+
 ```{r glmm_histology_female, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 thist6 <- tables_proportion_glmm(xi = hist6$pre$x, 
                               ni = hist6$pre$n,
                               analysis = hist6)
 
-plot_individual_proportion_glmm(words = thist6$b,
+plot_individual_proportion_glmm(words = as.matrix(thist6$b),
                               numbers = thist6$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 63: (GLMM) Frequency of Incidental Histology diagnosis in patients with TC and  tumor size >10mm </summary>
 <p>
+
 ```{r glmm_histology_greater10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 thist12 <- tables_proportion_glmm(xi = hist12$pre$x, 
                               ni = hist12$pre$n,
                               analysis = hist12,
                               tumorsize = TRUE)
 
-plot_individual_proportion_glmm(words = thist12$b,
+plot_individual_proportion_glmm(words = as.matrix(thist12$b),
                               numbers = thist12$c,
                               ind_box = 0.5,
                               overall_box = 1)
 
 ```
+
 </p>
 </details>
 
   
 <details><summary> Suppl. Figure 64: (GLMM) Frequency of Incidental Histology diagnosis in patients with TC and tumor size <10mm </summary>
 <p>
+
 ```{r glmm_histidental_less10, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 thist14 <- tables_proportion_glmm(xi = hist14$pre$x, 
                               ni = hist14$pre$n,
                               analysis = hist14,
                               tumorsize = TRUE)
 
-plot_individual_proportion_glmm(words = thist14$b,
+plot_individual_proportion_glmm(words = as.matrix(thist14$b),
                               numbers = thist14$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 65: (GLMM) Frequency of Incidental Histology diagnosis in patients with TC from the USA </summary>
 <p>
+
 ```{r glmm_histology_USA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 thist16 <- tables_proportion_glmm(xi = hist16$pre$x, 
                               ni = hist16$pre$n,
                               analysis = hist16)
 
-plot_individual_proportion_glmm(words = thist16$b,
+plot_individual_proportion_glmm(words = as.matrix(thist16$b),
                               numbers = thist16$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 66: (GLMM) Frequency of Incidental Histology diagnosis in patients with TC from a non-USA country </summary>
 <p>
+
 ```{r glmm_histology_nonUSA, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 thist18 <- tables_proportion_glmm(xi = hist18$pre$x, 
                               ni = hist18$pre$n,
                               analysis = hist18)
 
-plot_individual_proportion_glmm(words = thist18$b,
+plot_individual_proportion_glmm(words = as.matrix(thist18$b),
                               numbers = thist18$c,
                               ind_box = 0.5,
                               overall_box = 1)
 
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 67: (GLMM) Frequency of Incidental Histology diagnosis in patients with TC from population based studies </summary>
 <p>
+
 ```{r glmm_histology_pop, echo=FALSE, fig.height=3, fig.width=12, message=FALSE, warning=FALSE}
 thist20 <- tables_proportion_glmm(xi = hist20$pre$x, 
                               ni = hist20$pre$n,
                               analysis = hist20)
 
-plot_individual_proportion_glmm(words = thist20$b,
+plot_individual_proportion_glmm(words = as.matrix(thist20$b),
                               numbers = thist20$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 68: (GLMM) Frequency of Incidental Histology diagnosis in patients with TC from non-population-based studies </summary>
 <p>
+
 ```{r glmm_histology_nonpop, echo=FALSE, fig.height=4, fig.width=12, message=FALSE, warning=FALSE}
 thist22 <- tables_proportion_glmm(xi = hist22$pre$x, 
                               ni = hist22$pre$n,
                               analysis = hist22)
 
-plot_individual_proportion_glmm(words = thist22$b,
+plot_individual_proportion_glmm(words = as.matrix(thist22$b),
                               numbers = thist22$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
@@ -2340,33 +2288,37 @@ plot_individual_proportion_glmm(words = thist22$b,
 
 <details><summary> Suppl. Figure 69 (FT) Frequency of NON-Incidental diagnosis in patients with TC</summary>
   <p>
+  
 ```{r ft_nonincidental_overall, echo=FALSE, fig.height=5, fig.width=12, message=FALSE, warning=FALSE} 
 
 tnoninc1 <- tables_proportion_ft(xi = noninc1$pre$x, 
                               ni = noninc1$pre$n,
                               analysis = noninc1)
 
-plot_individual_proportion_ft(words = tnoninc1$b,
+plot_individual_proportion_ft(words = as.matrix(tnoninc1$b),
                               numbers = tnoninc1$c,
                               sizebox = 0.08,
                               box_ma_results = noninc1$ma,
                               overall_box = 1)
 ```
+
 </p>
 </details>
 
 
 <details><summary> Suppl. Figure 70 (GLMM) Frequency of NON-Incidental diagnosis in patients with TC</summary>
 <p>
+
 ```{r glmm_nonincidental_overall, echo=FALSE, fig.height=5, fig.width=12, message=FALSE, warning=FALSE}
 tnoninc2 <- tables_proportion_glmm(xi = noninc2$pre$x, 
                               ni = noninc2$pre$n,
                               analysis = noninc2)
 
-plot_individual_proportion_glmm(words = tnoninc2$b,
+plot_individual_proportion_glmm(words = as.matrix(tnoninc2$b),
                               numbers = tnoninc2$c,
                               ind_box = 0.5,
                               overall_box = 1)
 ```
+
 </p>
 </details>
