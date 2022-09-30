@@ -1,6 +1,5 @@
 Overdiagnosis
 ================
-5/18/2020
 
 <i>Analysis and visualization developed by [Oscar J.
 Ponce](https://twitter.com/PonceOJ), and the project was led by [Eddy P
@@ -8,12 +7,14 @@ Lincango-Naranjo](https://twitter.com/DoctorEddyMD)</i>
 
 ## Publication
 
-*Article was published in 2021. To know more about the methodology,
-results and conclusion of this study follow the link below.*
+*To know more about the methodology, results and conclusion of this
+study follow the link below.*
 
-| Title   | [Triggers of thyroid cancer diagnosis: a systematic review and meta-analysis](https://link.springer.com/article/10.1007/s12020-020-02588-8) |
-|:--------|:--------------------------------------------------------------------------------------------------------------------------------------------|
-| Journal | Endocrine                                                                                                                                   |
+| Title            | Triggers of thyroid cancer diagnosis: a systematic review and meta-analysis                |
+|:-----------------|:-------------------------------------------------------------------------------------------|
+| Journal          | Endocrine                                                                                  |
+| Publication date | 29 January 2021                                                                            |
+| DOI              | [10.1007/s12020-020-02588-8](https://link.springer.com/article/10.1007/s12020-020-02588-8) |
 
 ## Open Data
 

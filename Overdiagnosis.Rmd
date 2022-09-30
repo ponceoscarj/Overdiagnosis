@@ -1,6 +1,5 @@
 ---
 title: "Overdiagnosis"
-date: "5/18/2020"
 output: github_document
 knit: (function(inputFile, encoding) { rmarkdown::render(inputFile, encoding = encoding, output_file = paste0(dirname(inputFile),'/README.md')) })
 
@@ -10,11 +9,14 @@ knit: (function(inputFile, encoding) { rmarkdown::render(inputFile, encoding = e
 
 ## Publication
 
-*Article was published in 2021. To know more about the methodology, results and conclusion of this study follow the link below.*
+*To know more about the methodology, results and conclusion of this study follow the link below.*
 
-| Title      | [Triggers of thyroid cancer diagnosis: a systematic review and meta-analysis](https://link.springer.com/article/10.1007/s12020-020-02588-8) |
+| Title      | Triggers of thyroid cancer diagnosis: a systematic review and meta-analysis |
 | :--- | :---- |
 | Journal      | Endocrine       |
+| Publication date | 29 January 2021 |
+| DOI | [10.1007/s12020-020-02588-8](https://link.springer.com/article/10.1007/s12020-020-02588-8) |
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo=TRUE)
